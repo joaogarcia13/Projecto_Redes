@@ -23,6 +23,6 @@ wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP" > hostapd.conf
 
-docker build docker build -t wifi .
-docker run wifi
+docker build docker build -t hostapd .
+docker run hostapd
 
