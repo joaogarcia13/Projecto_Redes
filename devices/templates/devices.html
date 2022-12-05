@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>Device Listing</title>
+  </head>
+  <body>
+    <h1>All Devices</h1>
+    <ul>
+    {% for device in devices %}
+      <li>
+        <!-- <h2><a href="{{ device.get_absolute_url }}">{{ device.name }}</a></h2> -->
+      <h2> Device {{ device.name }}</h2>
+      <!-- <h2> Device {{ device.mac_address }}</h2> -->
+      </li>
+    {% endfor %}
+    </ul>
+  </body>
+</html>
