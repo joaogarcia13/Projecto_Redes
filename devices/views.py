@@ -1,13 +1,17 @@
 from django.shortcuts import render
-from devices.models import Device
-from django.http import HttpResponse
-from django import template
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
-from django.template import loader
 from django.urls import reverse
+from django import template
+from django.template import loader
+
+from django.http import HttpResponse, HttpResponseRedirect
+from django.http.response import JsonResponse
 # from rest_framework.parsers import JSONParser
-# from devices.serializers import DeviceSerializer
+# from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import default_storage
+from django.contrib.auth.decorators import login_required
+
+from devices.models import Device
+
 
 #def loadDevices(request):
 # def devices(request):
@@ -26,39 +30,44 @@ Copyright (c) 2019 - present AppSeed.us
 
 def index(request):
     context = {'segment': 'index'}
-
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
 
+def login(request):
+    context = {'segment': 'login'}
+    html_template = loader.get_template('home/login.html')
+    return HttpResponse(html_template.render(context, request))
 
-# def pages(request):
-#     context = {}
-#     # All resource paths end in .html.
-#     # Pick out the html file name from the url. And load that template.
-#     try:
-#         load_template = request.path.split('/')[-1]
 
-#         if load_template == 'admin':
-#             return HttpResponseRedirect(reverse('admin:index'))
-#         context['segment'] = load_template
+def pages(request):
+    context = {}
+    # All resource paths end in .html.
+    # Pick out the html file name from the url. And load that template.
+    try:
+        load_template = request.path.split('/')[-1]
 
-#         html_template = loader.get_template('home/' + load_template)
-#         return HttpResponse(html_template.render(context, request))
+        if load_template == 'admin':
+            return HttpResponseRedirect(reverse('admin:index'))
+        context['segment'] = load_template
 
-#     except template.TemplateDoesNotExist:
+        html_template = loader.get_template('home/' + load_template)
+        return HttpResponse(html_template.render(context, request))
 
-#         html_template = loader.get_template('home/page-404.html')
-#         return HttpResponse(html_template.render(context, request))
+    except template.TemplateDoesNotExist:
 
-#     except:
-#         html_template = loader.get_template('home/page-500.html')
-#         return HttpResponse(html_template.render(context, request))
+        html_template = loader.get_template('home/page-404.html')
+        return HttpResponse(html_template.render(context, request))
+
+    except:
+        html_template = loader.get_template('home/page-500.html')
+        return HttpResponse(html_template.render(context, request))
     
 
+# @csrf_exempt
 # def deviceAPI(request,id=0):
 #     if request.method=="GET":
-#         devices = Devices.objects.all()
-#         device_serializer = DeviceSerializer(devices,many=true)
+#         device = Device.objects.all()
+#         device_serializer = DeviceSerializer(device,many=true)
 #         return JsonResponse(device_serializer.data,safe=False)
 #     elif request.method=="POST":
 #         device_data = JSONParser().parse(request)
@@ -67,3 +76,21 @@ def index(request):
 #             device_serializer.save()
 #                 return JsonResponse("Added Successfully",safe=False)
 #         return JsonResponse("Failed to add",safe=False)
+#     elif request.method=='PUT':
+#         device_data = JSONParser().parse(request)
+#         device = Device.objects.get(deviceId=device_data['id'])
+#         devices_serializer = DeviceSerializer(device,data=device_data)
+#         if devices_serializer.is_valid():
+#             devices_serializer.save()
+#             return JsonResponse("Updated Successfully",safe=False)
+#         return JsonResponse("Failed to Update")
+#     elif request.method=='DELETE':
+#         device=Device.objects.get(deviceId=id)
+#         device.delete()
+#         return JsonResponse("Deleted Successfully",safe=False)
+
+# @csrf_exempt
+# def SaveFile(request):
+#     file=request.FILES['file']
+#     file_name=default_storage.save(file.name,file)
+#     return JsonResponse(file_name,safe=False)

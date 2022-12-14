@@ -8,15 +8,17 @@
 {% block content %}
 
     <div class="row">
-
+      <!-- Performance (Big line graph) -->
       <div class="col-12">
         <div class="card card-chart">
           <div class="card-header ">
             <div class="row">
               <div class="col-sm-6 text-left">
-                <h5 class="card-category">Total Shipments</h5>
+                <!-- <h5 class="card-category">Total Shipments</h5> -->
                 <h2 class="card-title">Performance</h2>
               </div>
+
+              <!-- Buttons (change dataset) -->
               <div class="col-sm-6">
                 <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
                   <label class="btn btn-sm btn-primary btn-simple active" id="0">
@@ -42,6 +44,7 @@
                   </label>
                 </div>
               </div>
+
             </div>
           </div>
           <div class="card-body">
@@ -53,7 +56,10 @@
       </div>
 
     </div>
+
+    <!-- Graps -->
     <div class="row">
+      <!-- Total Shipments (line graph) -->
       <div class="col-lg-4">
         <div class="card card-chart">
           <div class="card-header">
@@ -67,6 +73,7 @@
           </div>
         </div>
       </div>
+      <!-- Daily Sales (bar graph) -->
       <div class="col-lg-4">
         <div class="card card-chart">
           <div class="card-header">
@@ -80,6 +87,7 @@
           </div>
         </div>
       </div>
+      <!-- Completed Tasks (line graph) -->
       <div class="col-lg-4">
         <div class="card card-chart">
           <div class="card-header">
@@ -94,8 +102,12 @@
         </div>
       </div>
     </div>
+
+
     <div class="row">
-      <div class="col-lg-6 col-md-12">
+
+      <!-- Tasks -->
+      <!-- <div class="col-lg-6 col-md-12">
         <div class="card card-tasks">
           <div class="card-header ">
             <h6 class="title d-inline">Tasks(5)</h6>
@@ -246,7 +258,9 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
+
+      <!-- Simple Table -->
       <div class="col-lg-6 col-md-12">
         <div class="card ">
           <div class="card-header">
@@ -376,6 +390,7 @@
           </div>
         </div>
       </div>
+
     </div>
 
 {% endblock content %}

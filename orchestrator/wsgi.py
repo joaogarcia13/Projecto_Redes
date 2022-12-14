@@ -1,5 +1,5 @@
 """
-WSGI config for orquestrador project.
+WSGI config for orchestrator project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'orquestrador.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'orchestrator.settings')
 
 application = get_wsgi_application()
