@@ -3,7 +3,7 @@
 docker stop $(docker ps -a -q)
 docker rm $(docker ps -a -q)
 
-echo "nterface=wlan1
+echo "interface=wlan0
 #If this fails, try rt1871xdrv a 
 driver=nl80211
 # Name of the new network: best use the hostname
@@ -22,6 +22,8 @@ wpa_passphrase="$2"
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP" > hostapd.conf
+
+/usr/sbin/hostapd hostapd.conf
 
 docker build docker build -t hostapd .
 docker run hostapd
