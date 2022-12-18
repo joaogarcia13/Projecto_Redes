@@ -1,23 +1,18 @@
 #!/bin/bash
 
-ifconfig wlan0 $1/24 #pedir mascara 
-
 echo "
 subnet "$2" netmask 255.255.255.0 {
    range "$3" "$4";
-   option routers "$1";
-   option domain-name-servers 192.168.227.20;
+   #option routers "$6";
+   option domain-name-servers "$5";
 }
-" > dhcpd.conf #adicionar a string as subnets
-#definir dns mais tarde possivelmente hipoteticamente quem sabe
+" > dhcp.conf #adicionar a string as subnets
 
-#kill hostapd e dhcp
-/usr/sbin/hostapd hostapd.conf
-ifconfig wlan0 $1/24 up
+echo "ifconfig wlan0 "$1"/24 up
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 dhcpd -cf dhcp.conf wlan0
+echo 'dhcp started'" > init-network.sh
 
-#falta apanhar erros
 docker stop $(docker ps -a -q)
 docker rm $(docker ps -a -q)
 
@@ -26,3 +21,4 @@ docker run dhcp
 
 docker build docker build -t hostapd . 
 docker run hostapd
+
