@@ -61,4 +61,3 @@ fi
 
 docker build docker build -t hostapd .
 docker run hostapd
-

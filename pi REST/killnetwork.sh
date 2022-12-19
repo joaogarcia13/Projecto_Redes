@@ -2,4 +2,3 @@
 
 sudo pkill hostapd
 sudo pkill dhcpd
-
