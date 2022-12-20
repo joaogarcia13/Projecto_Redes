@@ -12,11 +12,11 @@ urlpatterns = [
 
     # The home page
     path('', views.index, name='home'),
-    path('login', views.login, name='login'),
+    # path('login', views.login, name='login'),
     # path('pages', views.pages, name='pages'),
 
     # Matches any html file
-    #re_path(r'^.*\.*', views.pages, name='pages'),
+    # re_path(r'^.*\.*', views.pages, name='pages'),
 
     # API
     # path(r'^device$',views.deviceAPI),

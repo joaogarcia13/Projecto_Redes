@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from django.urls import reverse
 from django import template
 from django.template import loader
+from django.urls import reverse
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http.response import JsonResponse
@@ -11,8 +11,11 @@ from django.core.files.storage import default_storage
 from django.contrib.auth.decorators import login_required
 
 from devices.models import Device
+#import requests
 
-
+"""
+As minhas funções
+"""
 #def loadDevices(request):
 # def devices(request):
 #     #return HttpResponse('Hello World!')
@@ -31,13 +34,21 @@ Copyright (c) 2019 - present AppSeed.us
 def index(request):
     context = {'segment': 'index'}
     html_template = loader.get_template('home/index.html')
-    return HttpResponse(html_template.render(context, request))
+
+    deviceList = Device.objects.all()
+
+    # return HttpResponse(html_template.render(context, request))
+    return render(request, 'home/index.html', {'devices': deviceList})
 
 def login(request):
     context = {'segment': 'login'}
     html_template = loader.get_template('home/login.html')
     return HttpResponse(html_template.render(context, request))
-
+    
+def logout(request):
+    context = {'segment': 'logout'}
+    html_template = loader.get_template('home/logout.html')
+    return HttpResponse(html_template.render(context, request))
 
 def pages(request):
     context = {}
@@ -61,7 +72,7 @@ def pages(request):
     except:
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
-    
+
 
 # @csrf_exempt
 # def deviceAPI(request,id=0):
