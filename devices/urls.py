@@ -17,11 +17,10 @@ urlpatterns = [
 
     # Matches any html file
     # re_path(r'^.*\.*', views.pages, name='pages'),
-    path('api/devices', views.getDevice, name=''),
 
     # API
-    # re_path('r"^devices$"', views.deviceAPI),
-    # re_path('r"^devices/([0-9]+)$"', views.deviceAPI),
-    # url(r'^device$',views.deviceAPI),
-    # url(r'^device/([0-9]+)$',views.deviceAPI),
+    path('api/devices', views.getDevice),
+    path('api/devices/new', views.setDevice),
+    path('api/devices/<int:id>/update', views.updateDevice),
+    path('api/devices/<int:id>/delete', views.deleteDevice),
 ]

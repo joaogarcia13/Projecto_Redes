@@ -1,12 +1,20 @@
 # Projecto_Redes [Orquestrador]
 
 ## Environment (venv)
-  **to create an environment**
-  python -m venv .venv
+  **CREATE an environment**
   
-  **to activate environment**
-  Linux: source .venv/bin/activate
-  Windows: .venv\Scripts\activate
+  ```python -m venv .venv```
+
+##
+  
+  **ACTIVATE environment**
+  
+  Linux: 
+  ```source .venv/bin/activate```
+  
+  Windows: 
+  ```.venv\Scripts\activate```
+##
 
 ## Django
 
@@ -17,7 +25,7 @@
 **Run:**
   *manage.py runserver [port] -> the default port is 8000*
   
-    manage.py runserver 8000
+    manage.py runserver
 
 **Data Base:**
   SQLite3 (need to install SQLiteStudio to edit "db.sqlite3")

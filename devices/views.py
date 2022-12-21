@@ -104,12 +104,42 @@ def deviceAPI(request,id=0):
 @api_view(['GET'])
 def getDevice(request,id=0):
     try:
-        # if request.method=="GET":
         devices = Device.objects.all()
         device_serializer = DeviceSerializer(devices,many=True)
         return JsonResponse(device_serializer.data,safe=False)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+@api_view(['POST'])
+def setDevice(request,id=0):
+    try:
+        device_data = JSONParser().parse(request)
+        device_serializer = DeviceSerializer(data=device_data)
+        if device_serializer.is_valid():
+            device_serializer.save()
+            return JsonResponse("Added Successfully", safe=False)
+        return JsonResponse("Failed to add", safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@api_view(['PUT'])
+def updateDevice(request,id):
+    device = Device.objects.get(device_id=id)
+    devices_serializer = DeviceSerializer(device,data=request.data)
+
+    if devices_serializer.is_valid():
+        devices_serializer.save()
+        return JsonResponse("Updated Successfully",safe=False)
+    else:
+        return JsonResponse("Failed to Update")
+
+@api_view(['DELETE'])
+def deleteDevice(request,id):
+    device = Device.objects.get(device_id=id)
+    device.delete()
+    return JsonResponse("Deleted Successfully", safe=False)
+
 
 # @csrf_exempt
 # def SaveFile(request):
