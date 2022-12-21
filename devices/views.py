@@ -5,13 +5,14 @@ from django.urls import reverse
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http.response import JsonResponse
-# from rest_framework.parsers import JSONParser
-# from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import default_storage
-from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view
+from rest_framework.parsers import JSONParser
+from django.views.decorators.csrf import csrf_exempt
+# from django.core.files.storage import default_storage
+# from django.contrib.auth.decorators import login_required
 
 from devices.models import Device
-#import requests
+from devices.serializers import DeviceSerializer
 
 """
 As minhas funções
@@ -74,31 +75,41 @@ def pages(request):
         return HttpResponse(html_template.render(context, request))
 
 
-# @csrf_exempt
-# def deviceAPI(request,id=0):
-#     if request.method=="GET":
-#         device = Device.objects.all()
-#         device_serializer = DeviceSerializer(device,many=true)
-#         return JsonResponse(device_serializer.data,safe=False)
-#     elif request.method=="POST":
-#         device_data = JSONParser().parse(request)
-#         device_serializer = DeviceSerializer(data=device_data)
-#         if device_serializer.is_valid():
-#             device_serializer.save()
-#                 return JsonResponse("Added Successfully",safe=False)
-#         return JsonResponse("Failed to add",safe=False)
-#     elif request.method=='PUT':
-#         device_data = JSONParser().parse(request)
-#         device = Device.objects.get(deviceId=device_data['id'])
-#         devices_serializer = DeviceSerializer(device,data=device_data)
-#         if devices_serializer.is_valid():
-#             devices_serializer.save()
-#             return JsonResponse("Updated Successfully",safe=False)
-#         return JsonResponse("Failed to Update")
-#     elif request.method=='DELETE':
-#         device=Device.objects.get(deviceId=id)
-#         device.delete()
-#         return JsonResponse("Deleted Successfully",safe=False)
+@csrf_exempt
+def deviceAPI(request,id=0):
+    if request.method=="GET":
+        devices = Device.objects.all()
+        device_serializer = DeviceSerializer(devices,many=True)
+        return JsonResponse(device_serializer.data,safe=False)
+    elif request.method=="POST":
+        device_data = JSONParser().parse(request)
+        device_serializer = DeviceSerializer(data=device_data)
+        if device_serializer.is_valid():
+            device_serializer.save()
+            return JsonResponse("Added Successfully",safe=False)
+        return JsonResponse("Failed to add",safe=False)
+    elif request.method=='PUT':
+        device_data = JSONParser().parse(request)
+        device = Device.objects.get(deviceId=device_data['id'])
+        devices_serializer = DeviceSerializer(device,data=device_data)
+        if devices_serializer.is_valid():
+            devices_serializer.save()
+            return JsonResponse("Updated Successfully",safe=False)
+        return JsonResponse("Failed to Update")
+    elif request.method=='DELETE':
+        device=Device.objects.get(deviceId=id)
+        device.delete()
+        return JsonResponse("Deleted Successfully",safe=False)
+
+@api_view(['GET'])
+def getDevice(request,id=0):
+    try:
+        # if request.method=="GET":
+        devices = Device.objects.all()
+        device_serializer = DeviceSerializer(devices,many=True)
+        return JsonResponse(device_serializer.data,safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 # @csrf_exempt
 # def SaveFile(request):
