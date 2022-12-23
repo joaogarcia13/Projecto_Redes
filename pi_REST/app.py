@@ -21,9 +21,8 @@ def setIP():
     range1 = request.form['range1']
     range2 = request.form['range2']
     dns = request.form['dns']
-    route = request.form['route']
 
-    subprocess.Popen(['nohup', 'sh', 'setIP.sh', ip, subnet, range1, range2, dns, route])
+    subprocess.Popen(['nohup', 'sh', 'setIP.sh', ip, subnet, range1, range2, dns])
 
     subprocess.Popen(['nohup','sh','init-network.sh'])
 
