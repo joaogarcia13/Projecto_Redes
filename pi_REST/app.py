@@ -33,4 +33,16 @@ def kill():
     subprocess.Popen(['nohup', 'sh', 'killnetwork.sh'])
 
     return "Access Point terminado"
+    
+@app.route("/switchOn", methods=['GET'])
+def switchON():
+    subprocess.Popen(['nohup', 'sh', 'init-network.sh'])
+    
+    return "Interface Switched On"
+    
+@app.route("/switchOff", methods=['GET'])
+def switchOFF():
+    subprocess.Popen(['nohup', 'sh', 'switchoff.sh'])
+    
+    return "Interface Switched Off"
 
