@@ -30,7 +30,6 @@ iptables –t mangle –A FORWARD –p tcp --sport 443 –i eth0 –j CLASSIFY -
 Iptables –t mangle –A FORWARD –p tcp --sport 25 –i eth0 –j CLASSIFY --set-class 1:20
 Iptables –t mangle –A FORWARD –p tcp --sport 110 –i eth0 –j CLASSIFY --set-class 1:20
 
-
 #Para elimiar um filtro
 sudo tc filter del dev $interface parent 1:0
 
