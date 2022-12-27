@@ -58,7 +58,7 @@ def iniciar_qos() :
 
 
 @app.route("/criarRegra", methods=['POST'])
-def createwifi():
+def createRegraQoS():
     interface = request.form['interface']
     name = request.form['name']
     velocidade = request.form['velocidade']
