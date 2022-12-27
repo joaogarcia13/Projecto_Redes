@@ -3,15 +3,23 @@ import subprocess
 
 app = Flask(__name__)
 
-@app.route("/qos/iniciar", methods=['POST'])
+@app.route("/iniciarQoS", methods=['POST'])
 def iniciar_qos() :
-    interface = request.json
+    interface = request.form['interface']
+
+    subprocess.Popen(['nohup', 'sh', 'QoS/iniciarQoS.sh', interface])
+
+    return "QoS iniciado"
 
 
-@app.route("/qos/aplicarRegra", methods=['POST'])
-def regras_qos() :
-    json = request.json
+@app.route("/criarRegra", methods=['POST'])
+def createwifi():
+    interface = request.form['interface']
+    name = request.form['name']
+    velocidade = request.form['velocidade']
+
     
+    subprocess.Popen(['nohup', 'sh', 'QoS/criarRegra.sh', interface, name, velocidade+10, velocidade])
 
-    return "ok"
+    return "Regra criada"
 
