@@ -15,6 +15,9 @@ sudo tc class add dev $interface parent 1:0 classid 1:1 htb rate $criarVariavelP
 sudo tc class add dev $interface parent 1:1 classid 1:10 htb rate 10mbit ceil 5mbit
 sudo tc class add dev $interface parent 1:1 classid 1:20 htb rate 250kbit ceil 100kbit 
 
+#apagar uma class
+sudo tc class del dev wlan0 classid $número da classe
+
 #Aplicar os filtros com as classes que queremos
 #parent tem de ser o número da classe principal e depois no flowid o número da classe que queremos associar
 #NOTA: Upload não estou a conseguir controlar
