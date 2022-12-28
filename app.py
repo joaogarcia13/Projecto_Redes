@@ -84,6 +84,6 @@ def createFiltroQoS():
 def monitoring() :
     interface = request.form['interface']
 
-    device = subprocess.Popen(['nohup', 'sh', 'networkManager/monitoring.sh', interface])
+    device = subprocess.check_output(['nohup', 'sh', 'networkManager/monitoring.sh', interface])
 
-    return device
+    return str(device)
