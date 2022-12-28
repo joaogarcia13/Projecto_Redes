@@ -52,7 +52,7 @@ def switchOFF():
 def iniciar_qos() :
     interface = request.form['interface']
 
-    subprocess.Popen(['nohup', 'sh', 'QoS/iniciarQoS.sh', interface])
+    subprocess.Popen(['nohup', 'sh', 'qos/iniciar.sh', interface])
 
     return "QoS iniciado"
 
@@ -64,7 +64,7 @@ def createRegraQoS():
     velocidade = request.form['velocidade']
 
     
-    subprocess.Popen(['nohup', 'sh', 'QoS/criarRegra.sh', interface, name, velocidade, velocidade])
+    subprocess.Popen(['nohup', 'sh', 'qos/criarRegra.sh', interface, name, velocidade, velocidade])
 
     return "Regra criada"
 
@@ -75,6 +75,6 @@ def createFiltroQoS():
     ip = request.form['ip']
 
     
-    subprocess.Popen(['nohup', 'sh', 'QoS/criarFiltro.sh', interface, ip, filtro])
+    subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', interface, ip, filtro])
 
     return "Filtro criado"
