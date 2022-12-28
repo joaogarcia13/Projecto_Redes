@@ -61,12 +61,29 @@ def iniciar_qos() :
 def createRegraQoS():
     interface = request.form['interface']
     name = request.form['name']
-    velocidade = request.form['velocidade']
+    velocidadeRedeBusy = request.form['velocidadeLimitada']
+    velocidadeNormal = request.form['velocidadeNormal']
 
     
-    subprocess.Popen(['nohup', 'sh', 'qos/criarRegra.sh', interface, name, velocidade, velocidade])
+    subprocess.Popen(['nohup', 'sh', 'qos/criarRegra.sh', interface, name, velocidadeRedeBusy, velocidadeNormal])
 
     return "Regra criada"
+
+@app.route("/apagarRegraQoS", methods=['POST'])
+def delRegraQoS():
+    name = request.form['name']
+    
+    subprocess.Popen(['nohup', 'sh', 'qos/apagarRegra.sh', name])
+
+    return "Regra apagada"
+
+@app.route("/verRegraQoS", methods=['POST'])
+def showRegraQoS():
+    name = request.form['name']
+    
+    regras = subprocess.check_output(['nohup', 'sh', 'qos/verRegras.sh', name])
+
+    return str(regras)
 
 @app.route("/criarFiltroQoS", methods=['POST'])
 def createFiltroQoS():
