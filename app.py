@@ -78,3 +78,12 @@ def createFiltroQoS():
     subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', interface, ip, filtro])
 
     return "Filtro criado"
+
+#Monitoring
+@app.route("/monitoring", methods=['POST'])
+def monitoring() :
+    interface = request.form['interface']
+
+    device = subprocess.Popen(['nohup', 'sh', 'networkManager/monitoring.sh', interface])
+
+    return device
