@@ -1,0 +1,198 @@
+<div id="edit-overlay" class="overlay device edit">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mt-5 offset-md-2 pt-5">
+                <div class="card">
+
+                    <div class="text-right" onclick="hideOverlay()" style="font-size: 20px; cursor: pointer; color: white">
+                        <icon class="tim-icons icon-simple-remove"></icon>
+                    </div>
+
+                    <div class="card-header text-center py-4">
+                        <h4 class="title">Edit</h4>
+                    </div>
+
+                    <form role="form" method="post" action="/edit/">
+                        {% csrf_token %}
+                        {{ form.as_ul }}
+                        <input type="hidden" name="csrfmiddlewaretoken" value="KprMSVvkMIcXMeaNzYVnU52aujIurGmYIml7mj1b6WZswzzhMSytrs0nyguGRywv">
+                        <div class="card-body px-5 py-3">
+                            <div class="row">
+
+                                <div class="col-md-6 px-md-1">
+                                    <div class="form-group">
+                                        <label>Device ID</label>
+                                        <input type="text" id="device_id" name="device_id" class="form-control" value="1" required="" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 px-md-1 text-center">
+                                    <div class="form-group">
+                                        <label>Status</label>
+<!--                                        <input type="text" id="device_status" name="device_status" class="form-control" value="raspberry" required="" >-->
+                                        <div>
+                                        <label class="switch theme-switch">
+                                            <input id="device_status" name="device_status" type="checkbox" class="bsc" checked>
+                                            <span class="slider round"></span>
+                                        </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 px-md-1">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input type="text" id="device_name" name="device_name" class="form-control" value="rpi" required="" >
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 px-md-1">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input type="text" id="device_mac_address" name="device_mac_address" class="form-control" value="1234" required="" >
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 px-md-1">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input type="text" id="device_ip" name="device_ip" class="form-control" value="10.0.0.1" required="" >
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 px-md-1">
+                                    <div class="form-group">
+                                        <i class="tim-icons icon-wifi text-primary"></i> <label>WiFi SSID</label>
+                                        <input type="text" id="device_ssid" name="device_ssid" class="form-control" value="rpi" required="" >
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-12 px-md-1">
+                                    <div class="form-group">
+                                        <i class="tim-icons icon-wifi text-primary"></i> <label>WiFi Password</label>
+                                        <input type="password" id="device_pwd" name="device_pwd" placeholder="Password" class="form-control" value="raspberry" required="">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 px-md-1">
+                                    <div class="form-group">
+                                        <label>Type</label>
+                                        <input type="text" id="device_type" name="device_type" class="form-control" value="raspberry" required="" >
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+
+                    <div style="text-align: right">
+                        <div class="btn btn-sm btn-primary active" onclick="saveData()">
+                          <icon class="tim-icons icon-check-2"></icon>
+                          <input style="width: 80px; height: 25px" type="submit" class="btn btn-link btn-icon">
+                          </input>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .overlay.device {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        background-color: #000;
+        /*opacity: 0.8;*/
+        opacity: 1;
+        width: 100%;
+        height: 100%;
+    }
+    .overlay.device .container .card {
+        opacity: 1;
+        z-index: 11;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 2px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked + .slider {
+      background-color: #e14eca;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #e14eca;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 30px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+</style>
+
+<script>
+function saveData() {
+   var obj = {
+        'device_id': document.getElementById("device_id").value,
+        'name': document.getElementById("device_name").value,
+        'ip': document.getElementById("device_ip").value,
+        'mac_address': document.getElementById("device_mac_address").value,
+        'wifi_ssid': document.getElementById("device_ssid").value,
+        'wifi_pwd': document.getElementById("device_pwd").value,
+        'type': document.getElementById("device_type").value,
+        'status': document.getElementById("device_status").checked
+    };
+    const myJSON = JSON.stringify(obj);
+    console.log(myJSON);
+
+    //window.location.href= "external/create_wifi/"+myJSON
+}
+</script>

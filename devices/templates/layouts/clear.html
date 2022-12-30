@@ -20,11 +20,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="apple-touch-icon" sizes="76x76" href="/static/assets/img/apple-icon.png">
-  <link rel="icon" type="image/png" href="/static/assets/img/favicon.png">
+  <!-- <link rel="icon" type="image/png" href="/static/assets/img/favicon.png"> -->
+  <link rel="icon" type="image/png" href="/static/assets/img/raspberry_pi_icon.png">
+  <!-- <link rel="icon" type="image/png" href="/static/assets/img/device-raspberrypi.png"> -->
   <link rel="canonical" href="https://appseed.us/admin-dashboards/django-dashboard-black">
-  
+
   <title>
-    Django Dashboard Black - {% block title %}{% endblock %} | AppSeed
+    {% block title %}{% endblock %}
   </title>
 
   <!--     Fonts and icons     -->
@@ -34,7 +36,6 @@
   <link href="/static/assets/css/nucleo-icons.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link href="/static/assets/css/black-dashboard.css?v=1.0.0" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-rtl.css" rel="stylesheet" />
   <!-- CSS Just for demo purpose, don't include it in your project -->
   <link href="/static/assets/demo/demo.css" rel="stylesheet" />
 
@@ -43,14 +44,10 @@
 
 </head>
 
-<body class="rtl menu-on-right ">
+<body class="">
   <div class="wrapper">
 
-    {% include 'includes/sidebar-rtl.html' %}
-
     <div class="main-panel">
-
-      {% include 'includes/navigation-rtl.html' %}
 
       <div class="content">
 
@@ -61,14 +58,12 @@
       {% include 'includes/footer.html' %}
 
     </div>
-    
+
   </div>
 
-  {% include 'includes/fixed-plugin.html' %}
+  <!-- 'includes/fixed-plugin.html' -->
 
   {% include 'includes/scripts.html' %}
-
-  {% include 'includes/scripts-sidebar.html' %}
 
   <!-- Specific Page JS goes HERE  -->
   {% block javascripts %}{% endblock javascripts %}

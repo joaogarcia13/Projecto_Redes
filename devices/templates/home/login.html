@@ -1,61 +1,58 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/clear.html" %}
 
-{% block title %} Login {% endblock %} 
+{% block title %} Login {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
 
+    <div class="container">
         <div class="row">
-          <div class="col-md-8">
-            <div class="card">
+            <div class="col-md-6 mt-5 offset-md-2 pt-5">
+                <div class="card">
 
-              <form role="form" method="post" action="">
-              
-                <div class="card-header">
-                  <h5 class="title">Login</h5>
+                    <div class="card-header text-center py-4">
+                        <h4 class="title">
+                            Sign In
+                        </h4>
 
-                  <h6 class="card-category">
-                      Add your credentials
-                  </h6>
-                </div>
-
-                <div class="card-body">
-
-                    <div class="row">
-
-                      <div class="col-md-3 px-md-1">
-                        <div class="form-group">
-                          <label>Username</label>
-                          <input class="form-control" id="username_login" name="username" required="" type="text" value="">
-                        </div>
-                      </div>
-
+                        <h6 class="card-category">
+                            <span>Default login: <strong>test / ApS12_ZZs8</strong></span>
+                        </h6>
                     </div>
-                    <div class="row">
 
-                      <div class="col-md-3 px-md-1">
-                        <div class="form-group">
-                          <label>Password</label>
-                          <input class="form-control" id="pwd_login" name="password" required="" type="password" value="">
+                    <form role="form" method="post" action="">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="KprMSVvkMIcXMeaNzYVnU52aujIurGmYIml7mj1b6WZswzzhMSytrs0nyguGRywv">
+                        <div class="card-body px-5 py-3">
+                            <div class="row">
+                                <div class="col-md-12 px-md-1">
+                                    <div class="form-group">
+                                        <label>Username</label>
+                                        <input type="text" name="username" placeholder="Username" class="form-control" value="test" required="" id="id_username">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 px-md-1">
+                                    <div class="form-group">
+                                        <label>Password</label>
+                                        <input type="password" name="password" placeholder="Password" class="form-control" value="ApS12_ZZs8" required="" id="id_password">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                      </div>
 
-                    </div>
-                    
+                        <div class="card-footer text-center">
+                            <button type="submit" name="login" class="btn btn-fill btn-primary">Login</button>
+                            <br><br>
+                            <p>Don't have an account? <a href="/register" class="text-primary">Register</a></p>
+                        </div>
+                    </form>
+
                 </div>
-                <div class="card-footer">
-                  <button type="submit" name="login" class="btn btn-fill btn-primary">Login</button>
-                  &nbsp; &nbsp;
-                  Don't have an account? <a href="/register.html" class="text-primary">Create</a>
-                </div>
-
-              </form>
-
             </div>
-          </div>
-      </div>
+        </div>
+    </div>
 
 
 {% endblock content %}
