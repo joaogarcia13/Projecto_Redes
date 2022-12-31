@@ -68,23 +68,13 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}
+{% block javascripts %}{% endblock javascripts %}
 
-  <script>
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      demo.initDashboardPageCharts();
-
-    });
-  </script>
-
-  <style>
-    .card-img {
-      padding: 15px;
-    }
-    .card-details {
-      padding: 0 15px 15px 0;
-    }
-  </style>
-
-{% endblock javascripts %}
+<style>
+  .card-img {
+    padding: 15px;
+  }
+  .card-details {
+    padding: 0 15px 15px 0;
+  }
+</style>

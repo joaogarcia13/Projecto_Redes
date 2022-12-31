@@ -140,13 +140,13 @@
             <h4 class="card-title">Switch settings</h4>
           </div>
           <div class="card-body text-center">
-            <div class="btn btn-sm btn-primary" onclick="showNotification('top','center','tim-icons icon-check-2','success','Switch on successful')">
+            <div class="btn btn-sm btn-primary" onclick="switch_on_api({{device.device_id}})">
               <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon"> <!-- external/switch_on/{{device.device_id}} -->
                 <span>Switch On</span>
               </a>
             </div>
-            <div class="btn btn-sm btn-primary" onclick="demo.showNotification('top','center')">
-              <a href="external/switch_on/{{device.device_id}}" style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
+            <div class="btn btn-sm btn-primary" onclick="switch_off_api({{device.device_id}})">
+              <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
                 <span>Switch Off</span>
               </a>
             </div>

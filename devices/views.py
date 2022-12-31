@@ -196,29 +196,31 @@ def formDevice(request):
 def external_api_switch_on(request,id):
     device = Device.objects.get(device_id=id)
     device_ip = device.ip
-    print(device_ip)
+
     req = requests.get(f'http://{device_ip}:5000/switchOn')
-    print(req)
+
+    if req.status_code == 200:
+        print('Status: ' + str(req) + ' IP: ' + device_ip)
+        # return Response("Ok.", status=req.status_code)
+    # else:
+    #     return Response({"error": "Request failed"}, status=req.status_code)
 
     return render(request, 'home/device_details.html', {'device': device})
-    # return JsonResponse("Switch enabled", safe=False)
 
 @api_view(['GET'])
 def external_api_switch_off(request,id):
     device = Device.objects.get(device_id=id)
     device_ip = device.ip
-    print(device_ip)
+
     req = requests.get(f'http://{device_ip}:5000/switchOff')
-    print(req)
 
     if req.status_code == 200:
-        data = req.json()
-        return Response(data, status=status.HTTP_200_OK)
-    else:
-        return Response({"error": "Request failed"}, status=req.status_code)
+        print('Status: ' + str(req) + ' IP: ' + device_ip)
+        # return Response("Ok.", status=req.status_code)
+    # else:
+    #     return Response({"error": "Request failed"}, status=req.status_code)
 
-    # return render(request, 'home/device_details.html', {'device': device})
-    # return JsonResponse("Switch enabled", safe=False)
+    return render(request, 'home/device_details.html', {'device': device})
 
 @api_view(['POST'])
 def external_api_set_ip(request, object):
@@ -256,3 +258,18 @@ def external_api_create_wifi(request, object):
     print(req)
 
     # return render(request, 'home/device_details.html', {'device': device})
+
+@api_view(['POST'])
+def external_api_set_ip(request, id, object):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
+
+    req = requests.get(f'http://{device_ip}:5000/switchOff')
+
+    if req.status_code == 200:
+        print('Status: ' + str(req) + ' IP: ' + device_ip)
+        # return Response("Ok.", status=req.status_code)
+    # else:
+    #     return Response({"error": "Request failed"}, status=req.status_code)
+
+    return render(request, 'home/device_details.html', {'device': device})

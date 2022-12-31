@@ -14,7 +14,7 @@
         </div>
 
         <ul class="nav">
-        {% if request.user.is_authenticated %}
+<!--        if request.user.is_authenticated-->
 
           <li class="{% if 'index' in segment %} active {% endif %}">
             <a href="/devices">
@@ -70,15 +70,16 @@
               <p>Logout</p>
             </a>
           </li>
-          {% else %}
-          <li class="active">
+
+          <!-- else -->
+          <!--<li class="active">
             <a target="_blank" 
                href="https://appseed.us/admin-dashboards/django-dashboard-black-pro">
               <i class="tim-icons icon-spaceship"></i>
               <p>PRO Version</p>
             </a>
-          </li>   
-          {% endif %}
+          </li>  -->
+          <!-- endif -->
                     
         </ul>
         
