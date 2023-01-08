@@ -9,4 +9,4 @@ sudo ufw default deny incoming
 sudo ufw default deny outgoing
 sudo ufw allow ssh
 sudo ufw allow 5000
-sudo ufw enable
+sudo ufw --force enable

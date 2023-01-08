@@ -1,2 +1,2 @@
 sudo ufw disable
-sudo ufw reset
+sudo ufw --force reset
