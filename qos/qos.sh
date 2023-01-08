@@ -33,5 +33,8 @@ Iptables –t mangle –A FORWARD –p tcp --sport 110 –i eth0 –j CLASSIFY -
 #Para elimiar um filtro
 sudo tc filter del dev $interface parent 1:0
 
+tc filter del dev <device> pref <priority> handle <filterhandle> <filtertype>
+sudo tc filter del dev wlan0 pref 49152 handle 800::800 u32
+
 #Para ver filtros
 sudo tc filter show dev wlan0 parent 1:0
