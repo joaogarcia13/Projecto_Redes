@@ -104,7 +104,7 @@ def createFiltroQoS():
 
 #Firewall
 @app.route("/resetFirewall", methods=['POST'])
-def createFiltroQoS():
+def resetFirewall():
 
     subprocess.Popen(['nohup', 'sh', 'firewall/reset.sh'])
     subprocess.Popen(['nohup', 'sh', 'firewall/iniciar.sh'])
