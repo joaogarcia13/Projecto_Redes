@@ -102,6 +102,15 @@ def createFiltroQoS():
 
     return "Filtro criado"
 
+#Firewall
+@app.route("/resetFirewall", methods=['POST'])
+def createFiltroQoS():
+
+    subprocess.Popen(['nohup', 'sh', 'firewall/reset.sh'])
+    subprocess.Popen(['nohup', 'sh', 'firewall/iniciar.sh'])
+
+    return "Firewall Resetada"
+
 #Monitoring
 @app.route("/monitoring", methods=['POST'])
 def monitoring() :
