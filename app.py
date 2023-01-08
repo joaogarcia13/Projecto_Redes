@@ -8,9 +8,9 @@ def createwifi():
     name = request.form['name']
     password = request.form['password']
     if (password == "null"):
-        subprocess.Popen(['nohup','sh', 'createwifi.sh', name])
+        subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name])
     else:
-        subprocess.Popen(['nohup','sh', 'createwifi.sh', name, password])
+        subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name, password])
     
     return "Wifi criada"
 
@@ -22,29 +22,28 @@ def setIP():
     range2 = request.form['range2']
     dns = request.form['dns']
 
-    subprocess.Popen(['nohup', 'sh', 'setIP.sh', ip, subnet, range1, range2, dns])
+    subprocess.Popen(['nohup', 'sh', 'pi_REST/setIP.sh', ip, subnet, range1, range2, dns])
 
-    subprocess.Popen(['nohup','sh','init-network.sh'])
+    subprocess.Popen(['nohup','sh','pi_REST/init-network.sh'])
 
     return "IP definido"
 
 @app.route("/killnetwork", methods=['GET'])
 def kill():
-    subprocess.Popen(['nohup', 'sh', 'killnetwork.sh'])
+    subprocess.Popen(['nohup', 'sh', 'pi_REST/killnetwork.sh'])
 
     return "Access Point terminado"
     
-@app.route("/switchOn", methods=['GET'])
+@app.route("/OnOffSwitch", methods=['POST'])
 def switchON():
-    subprocess.Popen(['nohup', 'sh', 'init-network.sh'])
-    
-    return "Interface Switched On"
-    
-@app.route("/switchOff", methods=['GET'])
-def switchOFF():
-    subprocess.Popen(['nohup', 'sh', 'switchoff.sh'])
-    
-    return "Interface Switched Off"
+    action = request.form['action']
+    if action == "on":
+        subprocess.Popen(['nohup', 'sh', 'pi_REST/init-network.sh'])
+        return "Interface Switched On"
+    if action == "off":
+        subprocess.Popen(['nohup', 'sh', 'pi_REST/switchoff.sh'])
+        return "Interface Switched Off"
+    return "Bad Api Call"
 
 
 #QoS
