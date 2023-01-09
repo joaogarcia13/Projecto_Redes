@@ -14,5 +14,5 @@ subnet $2 netmask 255.255.255.0 {
 echo "sudo ifconfig wlan0 $1/24 up
 sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 sudo dhcpd -cf dhcp.conf wlan0
-echo 'dhcp started'" > init-network.sh
+echo 'dhcp started'" > pi_REST/init-network.sh
 
