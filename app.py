@@ -47,11 +47,10 @@ def switchON():
     
 @app.route("/getinfo", methods=['GET'])
 def getinfo():
-    info = subprocess.check_output(['nohup', 'sh', 'getinfo.sh'])
+    info = subprocess.check_output(['nohup', 'sh', 'pi_Rest/getinfo.sh'])
     info_arr = info.decode().split("|")
     outinfo = "Cpu: " + str(100-int(info_arr[0])) + "%\nMemory: " + str(int(info_arr[1].split(" ")[1])/1000) + " Mb\nTemp: " + str(int(info_arr[2])/1000) + " Cº"
     return outinfo
-
 
 #QoS
 @app.route("/iniciarQoS", methods=['POST'])
