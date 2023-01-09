@@ -58,6 +58,3 @@ ignore_broadcast_ssid=0
 else
 	echo "Expected 1 or 2 arguments, got $#."
 fi
-
-docker build docker build -t hostapd .
-docker run hostapd
