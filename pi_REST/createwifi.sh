@@ -29,7 +29,7 @@ wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP" > hostapd.conf
 
-/usr/sbin/hostapd hostapd.conf
+/usr/sbin/hostapd ../hostapd.conf
 
 elif [ $# -eq 1 ]
 then
@@ -53,7 +53,7 @@ ignore_broadcast_ssid=0
 #wpa_pairwise=TKIP
 #rsn_pairwise=CCMP" > hostapd.conf
 
-/usr/sbin/hostapd hostapd.conf
+/usr/sbin/hostapd ../hostapd.conf
 
 else
 	echo "Expected 1 or 2 arguments, got $#."
