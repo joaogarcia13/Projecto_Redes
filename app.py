@@ -8,6 +8,9 @@ app = Flask(__name__)
 def createwifi():
     name = request.form['name']
     password = request.form['password']
+    if name == "" or password == "":
+    	return "name ou password vazio."
+    	
     if (password == "null"):
         subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name])
     else:
