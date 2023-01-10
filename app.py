@@ -1,5 +1,6 @@
 from flask import Flask, request
 import subprocess
+import ipaddress
 
 app = Flask(__name__)
 
@@ -21,12 +22,46 @@ def setIP():
     range1 = request.form['range1']
     range2 = request.form['range2']
     dns = request.form['dns']
+    
+    try:
+        ipaddress.ip_network(ip)
+    except:
+        return "Erro: ip inválido"
+    try:
+        ipaddress.ip_network(subnet+"/24")
+    except:
+        return "Erro: subnet com máscara inválida"
+    try:
+        ipaddress.ip_network(subnet)
+    except:
+        return "Erro: subnet inválida"
+    try:
+        ipaddress.ip_network(range1)
+    except:
+        return "Erro: range1 inválida"
+    try:
+        ipaddress.ip_network(range2)
+    except:
+        return "Erro: range2 inválida"
+    try:
+        ipaddress.ip_network(dns)
+    except:
+        return "Erro: dns inválido"
+    
+    if ipaddress.ip_address(range1) not in ipaddress.ip_network(subnet+"/24"):
+    	return "Erro: range1 fora da subnet"
+    	
+    elif ipaddress.ip_address(range2) not in ipaddress.ip_network(subnet+"/24"):
+    	return "Erro: range2 fora da subnet"
+    	
+    elif ipaddress.ip_address(range1) > ipaddress.ip_address(range2):
+    	return "Erro: range1 maior que range2"
+    else:
+    	subprocess.Popen(['nohup', 'sh', 'pi_REST/setIP.sh', ip, subnet, range1, range2, dns])
 
-    subprocess.Popen(['nohup', 'sh', 'pi_REST/setIP.sh', ip, subnet, range1, range2, dns])
+    	subprocess.Popen(['nohup','sh','pi_REST/init-network.sh'])
 
-    subprocess.Popen(['nohup','sh','pi_REST/init-network.sh'])
-
-    return "IP definido"
+    	return "IP definido"
 
 @app.route("/killnetwork", methods=['GET'])
 def kill():
