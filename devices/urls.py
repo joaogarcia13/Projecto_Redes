@@ -6,19 +6,14 @@ from django.conf import settings
 
 # URL Configs
 urlpatterns = [
-    path('devices/list/', views.device_listing),
-    path('devices/<int:id>', views.device_details),
-    # path('devices/<int:device_id>/', views.device_detail, name='device-detail'),
-    # path('devices/search/', views.device_search, name='device-search'),
-
     # The home page
+    path('', views.index, name='index'),
     path('devices/', views.index, name='home'),
-    path('login', views.pages, name='login'),
+    path('devices/<int:id>', views.device_details),
+    path('login', views.login_view, name='login'),
+    path('logout', views.logout_view, name='logout'),
     path('register', views.pages, name='register'),
-    path('ui-maps', views.pages),
-
-    # Matches any html file
-    # re_path(r'^.*\.*', views.pages, name='pages'),
+    path('devices/new', views.formDevice),
 
     # API
     path('api/devices', views.getDevice),
@@ -29,7 +24,13 @@ urlpatterns = [
     # External API
     path("devices/external/switch_on/<int:id>", views.external_api_switch_on),
     path("devices/external/switch_off/<int:id>", views.external_api_switch_off),
-    path("devices/external/setip/<int:id>", views.external_api_switch_off),
-    path("devices/external/create_wifi/<object>", views.external_api_create_wifi),
-    path('devices/new', views.formDevice),
+    path("devices/external/setip/<int:id>", views.external_api_set_ip),
+    path("devices/external/create_wifi/<int:id>", views.external_api_create_wifi),
+    path("devices/external/getinfo/<int:id>", views.external_api_get_info),
+
+    #Graphs
+    path('api/graph', views.createGraph),
+
+    # Matches any html file
+    # re_path(r'^.*\.*', views.pages, name='pages'),
 ]

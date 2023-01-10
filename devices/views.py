@@ -1,6 +1,6 @@
 import json
-
 import requests
+
 from django.shortcuts import render
 from django import template
 from django.template import loader
@@ -8,50 +8,60 @@ from django.urls import reverse
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http.response import JsonResponse
-from requests import Response
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
-from django.views.decorators.csrf import csrf_exempt
-# from django.core.files.storage import default_storage
-# from django.contrib.auth.decorators import login_required
 
-from devices.models import Device
+from devices.models import Device, Telemetry
 from devices.forms import DeviceForm
 from devices.serializers import DeviceSerializer
-
-"""
-As minhas funções
-"""
-#def loadDevices(request):
-# def devices(request):
-#     #return HttpResponse('Hello World!')
-#     return render(request,'devices.html')
-
-def device_listing(request):
-    """A view of all devices."""
-    deviceList = Device.objects.all()
-    return render(request, 'devices.html', {'devices': deviceList})
-    # return render(request, 'devices.html', {'devices': [{'name': '1'},{'name': '2'},{'name': '3'}]})
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 
 """
 Copyright (c) 2019 - present AppSeed.us
 """
 
+@login_required(login_url='/login')
 def index(request):
     context = {'segment': 'index'}
     html_template = loader.get_template('home/index.html')
 
-    deviceList = Device.objects.all()
+    deviceList = Device.objects.all().filter(status=1)
 
     # return HttpResponse(html_template.render(context, request))
     return render(request, 'home/index.html', {'devices': deviceList})
 
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect('/')
+def login_view(request):
+    logout(request)
+    username = password = ''
+    if request.POST:
+        username = request.POST['username']
+        password = request.POST['password']
 
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                # return HttpResponseRedirect('/')
+                if (request.POST['next'] == None):
+                    return HttpResponseRedirect('/')
+                else:
+                    return HttpResponseRedirect(request.POST['next'])
+
+    return render(request, 'home/login.html', )
+
+
+@login_required(login_url='/login')
 def device_details(request, id):
     device = Device.objects.get(device_id=id)
 
     return render(request, 'home/device_details.html', {'device': device})
 
+
+@login_required(login_url='/login')
 def pages(request):
     context = {}
     # All resource paths end in .html.
@@ -76,36 +86,9 @@ def pages(request):
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
 
-
-@csrf_exempt
-# def deviceAPI(request,id=0):
-#     if request.method=="GET":
-#         devices = Device.objects.all()
-#         device_serializer = DeviceSerializer(devices,many=True)
-#         return JsonResponse(device_serializer.data,safe=False)
-#     elif request.method=="POST":
-#         device_data = JSONParser().parse(request)
-#         device_serializer = DeviceSerializer(data=device_data)
-#         if device_serializer.is_valid():
-#             device_serializer.save()
-#             return JsonResponse("Added Successfully",safe=False)
-#         return JsonResponse("Failed to add",safe=False)
-#     elif request.method=='PUT':
-#         device_data = JSONParser().parse(request)
-#         device = Device.objects.get(deviceId=device_data['id'])
-#         devices_serializer = DeviceSerializer(device,data=device_data)
-#         if devices_serializer.is_valid():
-#             devices_serializer.save()
-#             return JsonResponse("Updated Successfully",safe=False)
-#         return JsonResponse("Failed to Update")
-#     elif request.method=='DELETE':
-#         device=Device.objects.get(deviceId=id)
-#         device.delete()
-#         return JsonResponse("Deleted Successfully",safe=False)
-
 # DEVICE CRUD
 @api_view(['GET'])
-def getDevice(request,id=0):
+def getDevice(request):
     try:
         devices = Device.objects.all()
         device_serializer = DeviceSerializer(devices,many=True)
@@ -142,6 +125,8 @@ def deleteDevice(request,id):
     device.delete()
     return JsonResponse("Deleted Successfully", safe=False)
 
+
+@login_required(login_url='/login')
 def formDevice(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -258,6 +243,7 @@ def external_api_create_wifi(request, object):
     print(req)
 
     # return render(request, 'home/device_details.html', {'device': device})
+    return JsonResponse("Created Successfully", safe=False)
 
 @api_view(['POST'])
 def external_api_set_ip(request, id, object):
@@ -273,3 +259,34 @@ def external_api_set_ip(request, id, object):
     #     return Response({"error": "Request failed"}, status=req.status_code)
 
     return render(request, 'home/device_details.html', {'device': device})
+
+
+@api_view(['GET'])
+def external_api_get_info(request, id):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
+
+    req = requests.get(f'http://{device_ip}:5000/getinfo')
+
+    if req.status_code == 200:
+        print('Status: ' + str(req) + ' IP: ' + device_ip)
+        # return Response("Ok.", status=req.status_code)
+    else:
+        print("Error: "+"Request failed")
+    #     return Response({"error": "Request failed"}, status=req.status_code)
+
+    return render(request, 'home/index.html', {'device': device})
+
+
+def createGraph(request,id):
+    telemetries = Telemetry.objects.get(device_id=id)
+    print(telemetries)
+    device_ip = telemetries.device_id.ip
+    print(device_ip)
+    req = requests.get(f'http://{device_ip}:5000/')
+
+    if req.status_code == 200:
+        print('Status: ' + str(req) + ' IP: ' + device_ip)
+
+
+    return render(request, 'home/device_details.html', {'data': telemetries})

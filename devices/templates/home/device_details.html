@@ -108,7 +108,8 @@
           </div>
 
           <div class="card-body">
-            <form role="form" method="post" action="">
+            <form role="form" method="post" action="" id="create_wifi_device">
+              {% csrf_token %}
               <div class="col-12">
                   <div class="form-group">
                       <label>WiFi SSID</label>
@@ -124,7 +125,7 @@
             </form>
 
             <div class="col-12 text-center">
-              <div class="btn btn-sm btn-primary">
+              <div class="btn btn-sm btn-primary" onclick="create_wifi_api({{device.device_id}})">
                 <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
                   <span>CREATE</span>
                 </a>
@@ -482,29 +483,47 @@
       </div>
     </div>-->
 
+    <!-- Charts -->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card card-chart">
+          <div class="card-header">
+            <h5 class="card-category">Bit rate</h5>
+            <h3 class="card-title"><i class="tim-icons icon-wifi text-primary"></i> Wi-Fi</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-area">
+              <canvas id="lineChartExample"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    //getDataGraph();
+    // Javascript method's body can be found in assets/js/demos.js
+    demo.initDashboardPageCharts();
 
-  <script>
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      demo.initDashboardPageCharts();
+    var data =[80, 100, 70, 80, 120, 80]
+    createChart(document.getElementById('lineChartExample'), data);
+  });
 
-    });
+  function showConfig() {
+    document.getElementById("config-overlay").style.display = "block";
+  }
+  function showEdit() {
+    document.getElementById("edit-overlay").style.display = "block";
+  }
 
-    function showConfig() {
-      document.getElementById("config-overlay").style.display = "block";
-    }
-    function showEdit() {
-      document.getElementById("edit-overlay").style.display = "block";
-    }
-
-    function hideOverlay() {
-      document.getElementById("config-overlay").style.display = "none";
-      document.getElementById("edit-overlay").style.display = "none";
-    }
-  </script>
-
+  function hideOverlay() {
+    document.getElementById("config-overlay").style.display = "none";
+    document.getElementById("edit-overlay").style.display = "none";
+  }
+</script>
 {% endblock javascripts %}

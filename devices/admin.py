@@ -6,10 +6,10 @@ from devices.models import Device
 # Create a custom admin class
 class DeviceAdmin(admin.ModelAdmin):
     # Set the fields to display on the list page
-    list_display = ('device_id','name','mac_address','status','type') # display fields on admin
+    list_display = ('device_id','name','ip','mac_address','wifi_ssid','wifi_pwd','type','status') # display fields on admin
 
     # Set the fields to be editable on the form page
-    fields = ('name','mac_address','status','type') # removed "device_id" field because it's auto-incremented
+    fields=('name','ip','mac_address','wifi_ssid','wifi_pwd','type','status') # removed "device_id" field because it's auto-incremented
 
     # list_filter = ('devices',)
 

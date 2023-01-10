@@ -12,10 +12,10 @@
       <!-- Total Shipments (line graph) -->
       {% for device in devices %}
       <div class="col-lg-4">
-        <div class="card card-chart">
+        <div class="card card-chart device-card" id="device-{{device.device_id}}" device="{{device.device_id}}">
           <div class="card-header">
             <h3 class="card-category">{{ device.name }} ({{ device.mac_address }})</h3>
-            <h4 class="card-title"><i class="tim-icons icon-wifi text-primary"></i> {{ device.wifi_ssid }}</h4>
+            <h4 class="card-title"><i class="tim-icons icon-wifi text-primary"></i> <span id="device_ssid">{{ device.wifi_ssid }}</span></h4>
           </div>
           <div class="card-body">
 
@@ -31,9 +31,9 @@
                 {% else  %}
                 <li><b>Estado:</b> <span style="color: red">Inativo <icon class="tim-icons icon-simple-remove"></icon></span></li>
                 {% endif  %}
-                <li><b>Temperatura:</b> ºC</li>
-                <li><b>Frequência:</b> Hz</li>
-                <li><b>Memória:</b> MB</li>
+                <li><b>Temperatura:</b> <span id="device_temp">-</span> ºC</li>
+                <li><b>CPU:</b> <span id="device_cpu">-</span> %</li>
+                <li><b>Memória:</b> <span id="device_mem">-</span> Mb</li>
               </div>
             </div>
             <!-- <div class="chart-area">
@@ -56,19 +56,33 @@
       {% endfor %}
     </div>
 
-      <div style="text-align: right">
-        <div class="btn btn-sm btn-primary">
-          <i class="tim-icons icon-simple-add"></i>
-          <a href="new" style="width: 150px; height: 25px" class="btn btn-link btn-icon">
-            <span>NEW DEVICE</span>
-          </a>
-        </div>
-      </div>
+<!--      <div style="text-align: right">-->
+        {% if user.is_superuser %}
+        <a href="new">
+          <div class="btn btn-sm btn-primary col-lg-12">
+            <i class="tim-icons icon-simple-add"></i>
+            <div style="width: 150px; height: 25px" class="btn btn-link btn-icon">
+              <span>NEW DEVICE</span>
+            </div>
+          </div>
+        </a>
+        {% endif %}
+<!--      </div>-->
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    //clearAllTimers();
+    getInfo();
+    window.setInterval( function() {
+      getInfo();
+    }, 10000);
+  });
+</script>
+{% endblock javascripts %}
 
 <style>
   .card-img {

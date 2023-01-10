@@ -18,25 +18,26 @@
                         </h4>
 
                         <h6 class="card-category">
-                            <span>Default login: <strong>test / ApS12_ZZs8</strong></span>
+                            <span>Default login: <strong>admin / admin</strong></span>
                         </h6>
                     </div>
 
-                    <form role="form" method="post" action="">
-                        <input type="hidden" name="csrfmiddlewaretoken" value="KprMSVvkMIcXMeaNzYVnU52aujIurGmYIml7mj1b6WZswzzhMSytrs0nyguGRywv">
+                    <form role="form" method="post" action="/login">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}"/>
                         <div class="card-body px-5 py-3">
                             <div class="row">
                                 <div class="col-md-12 px-md-1">
                                     <div class="form-group">
                                         <label>Username</label>
-                                        <input type="text" name="username" placeholder="Username" class="form-control" value="test" required="" id="id_username">
+                                        <input type="text" name="username" placeholder="Username" class="form-control" value="admin" required="" id="id_username">
                                     </div>
                                 </div>
 
                                 <div class="col-md-12 px-md-1">
                                     <div class="form-group">
                                         <label>Password</label>
-                                        <input type="password" name="password" placeholder="Password" class="form-control" value="ApS12_ZZs8" required="" id="id_password">
+                                        <input type="password" name="password" placeholder="Password" class="form-control" value="admin" required="" id="id_password">
                                     </div>
                                 </div>
                             </div>
