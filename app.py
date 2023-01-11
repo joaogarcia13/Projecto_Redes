@@ -87,7 +87,7 @@ def switchON():
 def getinfo():
     info = subprocess.check_output(['nohup', 'sh', 'pi_REST/getinfo.sh'])
     info_arr = info.decode().split("|")
-    outinfo = "Cpu: " + str(100-int(info_arr[0])) + "%\nMemory: " + str(int(info_arr[1].split(" ")[1])/1000) + " Mb\nTemp: " + str(int(info_arr[2])/1000) + " Cº"
+    outinfo = {"Cpu": str(100-int(info_arr[0])) + "%", "Memory": str(int(info_arr[1].split(" ")[1])/1000) + " Mb", "Temp": str(int(info_arr[2])/1000) + " Cº"}
     return outinfo
 
 #QoS
