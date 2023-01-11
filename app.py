@@ -7,10 +7,9 @@ app = Flask(__name__)
 
 @app.route("/createwifi", methods=['POST'])
 def createwifi():
-
-    check_interface = subprocess.check_output(['ps', 'aux', '|', 'grep', 'hostapd', '|', 'grep', 'root'])
-    
-    if not check_interface == None or not check_interface == "":
+    try:
+    	check_interface = subprocess.check_output(['ps', 'aux', '|', 'grep', 'hostapd', '|', 'grep', 'root'])
+    except:
     	return "Já existe uma interface a correr neste dispositivo"
 
     name = request.form['name']
