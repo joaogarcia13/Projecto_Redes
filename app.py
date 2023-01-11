@@ -7,6 +7,12 @@ app = Flask(__name__)
 
 @app.route("/createwifi", methods=['POST'])
 def createwifi():
+
+    check_interface = subprocess.check_output(['ps', 'aux', '|', 'grep', 'hostapd', '|', 'grep', 'root'])
+    
+    if check_interface == None or check_interface == "":
+    	return "Já existe uma interface a correr neste dispositivo"
+
     name = request.form['name']
     password = request.form['password']
     if name == "" or password == "":
@@ -51,6 +57,12 @@ def setIP():
         ipaddress.ip_network(dns)
     except:
         return "Erro: dns inválido"
+        
+    if ipaddress.ip_address(range1) in ipaddress.ip_network(subnet+"/24"):
+    	return "Erro: ip 0.0.0.0 não é valido"
+    
+    if ip == "127.0.0.1":
+    	return "Erro. ip 127.0.0.1 não é válido" 
     
     if ipaddress.ip_address(range1) not in ipaddress.ip_network(subnet+"/24"):
     	return "Erro: range1 fora da subnet"
