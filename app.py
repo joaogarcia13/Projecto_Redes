@@ -127,7 +127,7 @@ def createFiltroQoS():
     
     subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', interface, ip, filtro])
 
-    #outinfo = {"interface": , "priority": , "filterHandle": , "filterType": }
+    #outinfo = {"interface": interface, "priority": , "filterHandle": , "filterType": "u32"}
 
     #return json.dumps(outinfo)
     return "filtro criado"
