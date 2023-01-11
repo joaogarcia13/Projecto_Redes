@@ -8,7 +8,7 @@ app = Flask(__name__)
 @app.route("/createwifi", methods=['POST'])
 def createwifi():
     try:
-    	check_interface = subprocess.check_output(['ps', 'aux', '|', 'grep', 'hostapd', '|', 'grep', 'root'])
+    	check_interface = subprocess.check_output(['sh', 'ps', 'aux', '|', 'grep', 'hostapd', '|', 'grep', 'root'])
     except:
         name = request.form['name']
         password = request.form['password']
