@@ -10,7 +10,7 @@ def createwifi():
 
     check_interface = subprocess.check_output(['ps', 'aux', '|', 'grep', 'hostapd', '|', 'grep', 'root'])
     
-    if check_interface == None or check_interface == "":
+    if check_interface not None or check_interface not "":
     	return "Já existe uma interface a correr neste dispositivo"
 
     name = request.form['name']
