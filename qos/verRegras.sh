@@ -1,1 +1,0 @@
-sudo tc class show dev $1

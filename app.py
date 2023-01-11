@@ -9,6 +9,8 @@ app = Flask(__name__)
 def createwifi():
     name = request.form['name']
     password = request.form['password']
+    interface = request.form['interface']
+
     if name == "" or password == "":
         return "name ou password vazio."
                 
@@ -16,6 +18,8 @@ def createwifi():
         subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name])
     else:
         subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name, password])
+
+    subprocess.Popen(['nohup', 'sh', 'qos/iniciar.sh', interface])
             
     return "Wifi criada"
             
@@ -55,25 +59,26 @@ def setIP():
         return "Erro: dns inválido"
         
     if ipaddress.ip_address(range1) in ipaddress.ip_network(subnet+"/24"):
-    	return "Erro: ip 0.0.0.0 não é valido"
+        return "Erro: ip 0.0.0.0 não é valido"
     
     if ip == "127.0.0.1":
-    	return "Erro. ip 127.0.0.1 não é válido" 
+        return "Erro. ip 127.0.0.1 não é válido" 
     
     if ipaddress.ip_address(range1) not in ipaddress.ip_network(subnet+"/24"):
-    	return "Erro: range1 fora da subnet"
-    	
+        return "Erro: range1 fora da subnet"
+    
     elif ipaddress.ip_address(range2) not in ipaddress.ip_network(subnet+"/24"):
-    	return "Erro: range2 fora da subnet"
-    	
+        return "Erro: range2 fora da subnet"
+
     elif ipaddress.ip_address(range1) > ipaddress.ip_address(range2):
-    	return "Erro: range1 maior que range2"
+        return "Erro: range1 maior que range2"
+    
     else:
-    	subprocess.Popen(['nohup', 'sh', 'pi_REST/setIP.sh', ip, subnet, range1, range2, dns])
+        subprocess.Popen(['nohup', 'sh', 'pi_REST/setIP.sh', ip, subnet, range1, range2, dns])
 
-    	subprocess.Popen(['nohup','sh','pi_REST/init-network.sh'])
+        subprocess.Popen(['nohup','sh','pi_REST/init-network.sh'])
 
-    	return "IP definido"
+    return "IP definido"
 
 @app.route("/killnetwork", methods=['GET'])
 def kill():
@@ -100,15 +105,6 @@ def getinfo():
     return json.dumps(outinfo)
 
 #QoS
-@app.route("/iniciarQoS", methods=['POST'])
-def iniciar_qos() :
-    interface = request.form['interface']
-
-    subprocess.Popen(['nohup', 'sh', 'qos/iniciar.sh', interface])
-
-    return "QoS iniciado"
-
-
 @app.route("/criarRegraQoS", methods=['POST'])
 def createRegraQoS():
     interface = request.form['interface']
@@ -121,22 +117,6 @@ def createRegraQoS():
 
     return "Regra criada"
 
-@app.route("/apagarRegraQoS", methods=['POST'])
-def delRegraQoS():
-    name = request.form['name']
-    
-    subprocess.Popen(['nohup', 'sh', 'qos/apagarRegra.sh', name])
-
-    return "Regra apagada"
-
-@app.route("/verRegraQoS", methods=['POST'])
-def showRegraQoS():
-    name = request.form['name']
-    
-    regras = subprocess.check_output(['nohup', 'sh', 'qos/verRegras.sh', name])
-
-    return str(regras)
-
 @app.route("/criarFiltroQoS", methods=['POST'])
 def createFiltroQoS():
     interface = request.form['interface']
@@ -146,7 +126,30 @@ def createFiltroQoS():
     
     subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', interface, ip, filtro])
 
-    return "Filtro criado"
+    #outinfo = {"interface": , "priority": , "filterHandle": , "filterType": }
+
+    #return json.dumps(outinfo)
+    return "filtro criado"
+
+@app.route("/apagarRegraQoS", methods=['POST'])
+def delRegraQoS():
+    name = request.form['name']
+    
+    subprocess.Popen(['nohup', 'sh', 'qos/apagarRegra.sh', name])
+
+    return "Regra apagada"
+
+@app.route("/apagarFiltroQoS", methods=['POST'])
+def delFiltroQoS():
+    interface = request.form['interface']
+    priority = request.form['priority']
+    filterHandle = request.form['filterHandle']
+    filterType = request.form['filterType']
+
+    subprocess.Popen(['nohup', 'sh', 'qos/apagarFiltro.sh', interface, priority, filterHandle, filterType])
+
+    return "Filtro apagado"
+
 
 #Firewall
 @app.route("/resetFirewall", methods=['POST'])
