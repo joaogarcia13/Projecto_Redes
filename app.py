@@ -1,6 +1,7 @@
 from flask import Flask, request
 import subprocess
 import ipaddress
+import json
 
 app = Flask(__name__)
 
@@ -87,8 +88,8 @@ def switchON():
 def getinfo():
     info = subprocess.check_output(['nohup', 'sh', 'pi_REST/getinfo.sh'])
     info_arr = info.decode().split("|")
-    outinfo = {"Cpu": str(100-int(info_arr[0])) + "%", "Memory": str(int(info_arr[1].split(" ")[1])/1000) + " Mb", "Temp": str(int(info_arr[2])/1000) + " Cº"}
-    return outinfo
+    outinfo = {"cpu": {"value": str(100-float(info_arr[0])), "units": "%"}, "Memory": {"value":str(float(info_arr[1].split(" ")[1])/1000), "units": "Mb"}, "Temp": {"value": str(float(info_arr[2])/1000), "units":"Cº"}}
+    return json.dumps(outinfo)
 
 #QoS
 @app.route("/iniciarQoS", methods=['POST'])
