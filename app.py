@@ -152,6 +152,26 @@ def delFiltroQoS():
 
 
 #Firewall
+@app.route("/criarRegraFirewall", methods=['POST'])
+def criarRegraFirewall():
+    interface = request.form['interface']
+    tipo = request.form['tipo']
+    ipPort = request.form['ipPort']
+
+    subprocess.Popen(['nohup', 'sh', 'firewall/criarRegra.sh', interface, tipo, ipPort])
+
+    return "Regra criada"
+
+@app.route("/apagarRegraFirewall", methods=['POST'])
+def apagarRegraFirewall():
+    interface = request.form['interface']
+    tipo = request.form['tipo']
+    ipPort = request.form['ipPort']
+
+    subprocess.Popen(['nohup', 'sh', 'firewall/criarRegra.sh', interface, tipo, ipPort])
+
+    return "Regra apagada"
+
 @app.route("/resetFirewall", methods=['POST'])
 def resetFirewall():
 
