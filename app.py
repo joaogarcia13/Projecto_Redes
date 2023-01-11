@@ -10,19 +10,21 @@ def createwifi():
     try:
     	check_interface = subprocess.check_output(['ps', 'aux', '|', 'grep', 'hostapd', '|', 'grep', 'root'])
     except:
-    	return "Já existe uma interface a correr neste dispositivo"
-
-    name = request.form['name']
-    password = request.form['password']
-    if name == "" or password == "":
-    	return "name ou password vazio."
+	name = request.form['name']
+	password = request.form['password']
+	if name == "" or password == "":
+	    return "name ou password vazio."
+	    	
+	if (password == "null"):
+	    subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name])
+	else:
+	    subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name, password])
+	    
+	return "Wifi criada"
     	
-    if (password == "null"):
-        subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name])
-    else:
-        subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name, password])
+    return "Já existe uma interface a correr neste dispositivo"
+
     
-    return "Wifi criada"
 
 @app.route("/setip", methods=['POST'])
 def setIP():
