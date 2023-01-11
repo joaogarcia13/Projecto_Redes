@@ -20,6 +20,7 @@ def createwifi():
         subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name, password])
 
     subprocess.Popen(['nohup', 'sh', 'qos/iniciar.sh', interface])
+    subprocess.Popen(['nohup', 'sh', 'firewall/iniciar.sh'])
             
     return "Wifi criada"
             
@@ -172,14 +173,6 @@ def apagarRegraFirewall():
 
     return "Regra apagada"
 
-@app.route("/resetFirewall", methods=['POST'])
-def resetFirewall():
-
-    subprocess.Popen(['nohup', 'sh', 'firewall/reset.sh'])
-    subprocess.Popen(['nohup', 'sh', 'firewall/iniciar.sh'])
-
-    return "Firewall Resetada"
-
 #Monitoring
 @app.route("/monitoring", methods=['POST'])
 def monitoring() :
@@ -188,3 +181,10 @@ def monitoring() :
     device = subprocess.check_output(['nohup', 'sh', 'networkManager/monitoring.sh', interface])
 
     return str(device)
+
+#Manutenção
+@app.route("/update", methods=['GET'])
+def updatePi() :
+    subprocess.Popen(['nohup', 'sh', 'updatePi.sh'])
+
+    return "Already update."
