@@ -7,24 +7,19 @@ app = Flask(__name__)
 
 @app.route("/createwifi", methods=['POST'])
 def createwifi():
-    try:
-    	check_interface = subprocess.check_output(['sh', 'ps', 'aux', '|', 'grep', 'hostapd', '|', 'grep', 'root'], shell=True)
-    except:
-        name = request.form['name']
-        password = request.form['password']
-        if name == "" or password == "":
-            return "name ou password vazio."
+    name = request.form['name']
+    password = request.form['password']
+    if name == "" or password == "":
+        return "name ou password vazio."
                 
-        if (password == "null"):
-            subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name])
-        else:
-            subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name, password])
+    if (password == "null"):
+        subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name])
+    else:
+        subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name, password])
             
-        return "Wifi criada"
+    return "Wifi criada"
             
-        return "Já existe uma interface a correr neste dispositivo"
 
-    
 
 @app.route("/setip", methods=['POST'])
 def setIP():
