@@ -72,7 +72,7 @@ def kill():
 
     return "Access Point terminado"
     
-@app.route("/OnOffSwitch", methods=['POST'])
+@app.route("/toggleSwitch", methods=['POST'])
 def switchON():
     action = request.form['action']
     if action == "on":
