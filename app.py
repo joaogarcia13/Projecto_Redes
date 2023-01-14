@@ -9,7 +9,6 @@ app = Flask(__name__)
 def createwifi():
     name = request.form['name']
     password = request.form['password']
-    interface = request.form['interface']
 
     if name == "" or password == "":
         return "name ou password vazio."
@@ -19,7 +18,7 @@ def createwifi():
     else:
         subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name, password])
 
-    subprocess.Popen(['nohup', 'sh', 'qos/iniciar.sh', interface])
+    subprocess.Popen(['nohup', 'sh', 'qos/iniciar.sh', 'wlan0'])
     subprocess.Popen(['nohup', 'sh', 'firewall/iniciar.sh'])
             
     return "Wifi criada"
@@ -59,7 +58,7 @@ def setIP():
     except:
         return "Erro: dns inválido"
         
-    if ipaddress.ip_address(range1) in ipaddress.ip_network(subnet+"/24"):
+    if  ip == "0.0.0.0":
         return "Erro: ip 0.0.0.0 não é valido"
     
     if ip == "127.0.0.1":
