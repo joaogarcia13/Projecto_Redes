@@ -25,6 +25,7 @@
                     <th>IP Address</th>
                     <th>MAC Address</th>
                     <th>Type</th>
+                    <th>Created</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -34,10 +35,11 @@
                     <td>{{device.ip}}</td>
                     <td>{{device.mac_address}}</td>
                     <td>{{device.type}}</td>
+                    <td>{{device.created_at}}</td>
                     {% if device.status %}
-                    <td> <icon class="tim-icons icon-check-2"></icon></td>
-                    {% else  %}
-                    <td> <icon class="tim-icons icon-simple-remove"></icon></td>
+                      <td> <icon class="tim-icons icon-check-2"></icon></td>
+                      {% else  %}
+                      <td> <icon class="tim-icons icon-simple-remove"></icon></td>
                     {% endif  %}
                   </tr>
                 </tbody>
@@ -104,30 +106,28 @@
       <div class="col-md-6">
         <div class="card">
           <div class="card-header ">
-            <h4 class="card-title">Create WiFi</h4>
+            <h4 class="card-title">WiFi Settings</h4>
           </div>
-
           <div class="card-body">
             <form role="form" method="post" action="" id="create_wifi_device">
               {% csrf_token %}
               <div class="col-12">
                   <div class="form-group">
                       <label>WiFi SSID</label>
-                      <input type="text" id="wifi_name" name="wifi_name" class="form-control" required="" >
+                      <input type="text" id="wifi_name" name="wifi_name" class="form-control" value="{{device.wifi_ssid}}" >
                   </div>
               </div>
               <div class="col-12">
                   <div class="form-group">
                       <label>WiFi Password</label>
-                      <input type="password" id="wifi_password" name="wifi_password" class="form-control" required="" >
+                      <input type="password" id="wifi_password" name="wifi_password" class="form-control" >
                   </div>
               </div>
             </form>
-
             <div class="col-12 text-center">
               <div class="btn btn-sm btn-primary" onclick="create_wifi_api({{device.device_id}})">
                 <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
-                  <span>CREATE</span>
+                  <span>SAVE</span>
                 </a>
               </div>
             </div>
@@ -141,12 +141,12 @@
             <h4 class="card-title">Switch settings</h4>
           </div>
           <div class="card-body text-center">
-            <div class="btn btn-sm btn-primary" onclick="switch_on_api({{device.device_id}})">
+            <div class="btn btn-sm btn-primary" onclick="switch_toggle_api({{device.device_id}}, 'on')">
               <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon"> <!-- external/switch_on/{{device.device_id}} -->
                 <span>Switch On</span>
               </a>
             </div>
-            <div class="btn btn-sm btn-primary" onclick="switch_off_api({{device.device_id}})">
+            <div class="btn btn-sm btn-primary" onclick="switch_toggle_api({{device.device_id}}, 'off')">
               <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
                 <span>Switch Off</span>
               </a>
@@ -160,7 +160,7 @@
             <h4 class="card-title">Network</h4>
           </div>
           <div class="card-body text-center">
-            <div class="btn btn-sm btn-primary">
+            <div class="btn btn-sm btn-primary" onclick="kill_network_api({{device.device_id}})">
               <a style="width: 200px; height: 25px" type="button" class="btn btn-link btn-icon">
                 <span>KILL NETWORK</span>
               </a>
@@ -328,160 +328,6 @@
     </div>
 
     <!-- Tasks -->
-    <!--<div class="row">
-      <div class="col-lg-6 col-md-12">
-        <div class="card card-tasks">
-          <div class="card-header ">
-            <h6 class="title d-inline">Tasks(5)</h6>
-            <p class="card-category d-inline">today</p>
-            <div class="dropdown">
-              <button type="button" class="btn btn-link dropdown-toggle btn-icon" data-toggle="dropdown">
-                <i class="tim-icons icon-settings-gear-63"></i>
-              </button>
-              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                <a class="dropdown-item" href="#pablo">Action</a>
-                <a class="dropdown-item" href="#pablo">Another action</a>
-                <a class="dropdown-item" href="#pablo">Something else</a>
-              </div>
-            </div>
-          </div>
-          <div class="card-body ">
-            <div class="table-full-width table-responsive">
-              <table class="table">
-                <tbody>
-                  <tr>
-                    <td>
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" value="">
-                          <span class="form-check-sign">
-                            <span class="check"></span>
-                          </span>
-                        </label>
-                      </div>
-                    </td>
-                    <td>
-                      <p class="title">Update the Documentation</p>
-                      <p class="text-muted">Dwuamish Head, Seattle, WA 8:47 AM</p>
-                    </td>
-                    <td class="td-actions text-right">
-                      <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                        <i class="tim-icons icon-pencil"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" value="" checked="">
-                          <span class="form-check-sign">
-                            <span class="check"></span>
-                          </span>
-                        </label>
-                      </div>
-                    </td>
-                    <td>
-                      <p class="title">GDPR Compliance</p>
-                      <p class="text-muted">The GDPR is a regulation that requires businesses to protect the personal data and privacy of Europe citizens for transactions that occur within EU member states.</p>
-                    </td>
-                    <td class="td-actions text-right">
-                      <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                        <i class="tim-icons icon-pencil"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" value="">
-                          <span class="form-check-sign">
-                            <span class="check"></span>
-                          </span>
-                        </label>
-                      </div>
-                    </td>
-                    <td>
-                      <p class="title">Solve the issues</p>
-                      <p class="text-muted">Fifty percent of all respondents said they would be more likely to shop at a company </p>
-                    </td>
-                    <td class="td-actions text-right">
-                      <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                        <i class="tim-icons icon-pencil"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" value="">
-                          <span class="form-check-sign">
-                            <span class="check"></span>
-                          </span>
-                        </label>
-                      </div>
-                    </td>
-                    <td>
-                      <p class="title">Release v2.0.0</p>
-                      <p class="text-muted">Ra Ave SW, Seattle, WA 98116, SUA 11:19 AM</p>
-                    </td>
-                    <td class="td-actions text-right">
-                      <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                        <i class="tim-icons icon-pencil"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" value="">
-                          <span class="form-check-sign">
-                            <span class="check"></span>
-                          </span>
-                        </label>
-                      </div>
-                    </td>
-                    <td>
-                      <p class="title">Export the processed files</p>
-                      <p class="text-muted">The report also shows that consumers will not easily forgive a company once a breach exposing their personal data occurs. </p>
-                    </td>
-                    <td class="td-actions text-right">
-                      <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                        <i class="tim-icons icon-pencil"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" value="">
-                          <span class="form-check-sign">
-                            <span class="check"></span>
-                          </span>
-                        </label>
-                      </div>
-                    </td>
-                    <td>
-                      <p class="title">Arival at export process</p>
-                      <p class="text-muted">Capitol Hill, Seattle, WA 12:34 AM</p>
-                    </td>
-                    <td class="td-actions text-right">
-                      <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                        <i class="tim-icons icon-pencil"></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>-->
 
     <!-- Charts -->
     <div class="row">

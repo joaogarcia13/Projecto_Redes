@@ -8,40 +8,48 @@ from django.urls import reverse
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http.response import JsonResponse
-from rest_framework.decorators import api_view
-from rest_framework.parsers import JSONParser
 
-from devices.models import Device, Telemetry
+from devices.models import Device, Telemetry, Floor, Device_Floor
 from devices.forms import DeviceForm
-from devices.serializers import DeviceSerializer
+from devices.serializers import DeviceSerializer, FloorSerializer, Device_Floor_Serializer
+from django.core.files import File
+from django.core.files.storage import default_storage
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.parsers import JSONParser
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 
 """
 Copyright (c) 2019 - present AppSeed.us
 """
 
-@login_required(login_url='/login')
-def index(request):
-    context = {'segment': 'index'}
-    html_template = loader.get_template('home/index.html')
-
-    deviceList = Device.objects.all().filter(status=1)
-
-    # return HttpResponse(html_template.render(context, request))
-    return render(request, 'home/index.html', {'devices': deviceList})
-
+# --- PAGES
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/')
+
+
 def login_view(request):
     logout(request)
     username = password = ''
+
     if request.POST:
         username = request.POST['username']
         password = request.POST['password']
 
         user = authenticate(request, username=username, password=password)
+
+        # authentication_classes = [SessionAuthentication, BasicAuthentication]
+        # permission_classes = [IsAuthenticated]
+        # print('is Auth?: '+permission_classes[0])
+        # token = Token.objects.create(user=...)
+        # print('TOKEN'+token.key)
+
         if user is not None:
             if user.is_active:
                 login(request, user)
@@ -55,10 +63,29 @@ def login_view(request):
 
 
 @login_required(login_url='/login')
+def index(request):
+    context = {'segment': 'index'}
+    html_template = loader.get_template('home/index.html')
+
+    if request.user.is_superuser:
+        deviceList = Device.objects.all()
+    else:
+        deviceList = Device.objects.all().filter(status=1)
+
+    # return HttpResponse(html_template.render(context, request))
+    return render(request, 'home/index.html', {'devices': deviceList})
+
+
+@login_required(login_url='/login')
 def device_details(request, id):
     device = Device.objects.get(device_id=id)
-
     return render(request, 'home/device_details.html', {'device': device})
+
+
+@login_required(login_url='/login')
+def map(request):
+    floors = Floor.objects.all()
+    return render(request, 'home/map.html', {'floors': floors})
 
 
 @login_required(login_url='/login')
@@ -68,7 +95,7 @@ def pages(request):
     # Pick out the html file name from the url. And load that template.
     try:
         load_template = request.path.split('/')[-1]
-        print("PAGES -> "+load_template)
+        print("PAGES -> " + load_template)
 
         if load_template == 'admin':
             return HttpResponseRedirect(reverse('admin:index'))
@@ -86,15 +113,25 @@ def pages(request):
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
 
-# DEVICE CRUD
+
+# AUTH
+# --- DEVICE API
 @api_view(['GET'])
 def getDevice(request):
     try:
+        content = {
+            'user': str(request.user),  # `django.contrib.auth.User` instance.
+            'auth': str(request.auth),  # None
+        }
+        print('user' + str(request.user))
+        print('auth' + str(request.auth))
+
         devices = Device.objects.all()
-        device_serializer = DeviceSerializer(devices,many=True)
-        return JsonResponse(device_serializer.data,safe=False)
+        device_serializer = DeviceSerializer(devices, many=True)
+        return JsonResponse(device_serializer.data, safe=False)
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400)
+        return JsonResponse({'Error': str(e)}, status=400)
+
 
 @api_view(['POST'])
 def setDevice(request):
@@ -108,19 +145,21 @@ def setDevice(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
+
 @api_view(['PUT'])
-def updateDevice(request,id):
+def updateDevice(request, id):
     device = Device.objects.get(device_id=id)
-    devices_serializer = DeviceSerializer(device,data=request.data)
+    devices_serializer = DeviceSerializer(device, data=request.data)
 
     if devices_serializer.is_valid():
         devices_serializer.save()
-        return JsonResponse("Updated Successfully",safe=False)
+        return JsonResponse("Updated Successfully", safe=False)
     else:
-        return JsonResponse("Failed to Update")
+        return JsonResponse("Failed to Update", safe=False)
+
 
 @api_view(['DELETE'])
-def deleteDevice(request,id):
+def deleteDevice(request, id):
     device = Device.objects.get(device_id=id)
     device.delete()
     return JsonResponse("Deleted Successfully", safe=False)
@@ -169,50 +208,71 @@ def formDevice(request):
 
     return render(request, 'home/device/new.html', {'form': form})
 
-# @csrf_exempt
-# def SaveFile(request):
-#     file=request.FILES['file']
-#     file_name=default_storage.save(file.name,file)
-#     return JsonResponse(file_name,safe=False)
+
+@api_view(['GET'])
+def drawDevices(request):
+    try:
+        coords = Device_Floor.objects.all()
+        print('coordinates' + str(coords))
+
+        device_floor_serializer = Device_Floor_Serializer(coords, many=True)
+        return JsonResponse(device_floor_serializer.data, safe=False)
+    except Exception as e:
+        return JsonResponse("Error: " + str(e), safe=False)
 
 
 # EXTERNAL API
 @api_view(['GET'])
-def external_api_switch_on(request,id):
+def external_api_toggle_switch(request, id):
     device = Device.objects.get(device_id=id)
     device_ip = device.ip
 
-    req = requests.get(f'http://{device_ip}:5000/switchOn')
+    switch_command = request.GET["data"]
+    obj = {
+        "action": switch_command
+    }
+    try:
+        req = requests.post(f'http://{device_ip}:5000/toggleSwitch', data=obj)
+        if req.status_code == 200:
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
+            return JsonResponse("Switch set")
+        else:
+            return JsonResponse({"Error": "Request failed"}, status=req.status_code)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
 
-    if req.status_code == 200:
-        print('Status: ' + str(req) + ' IP: ' + device_ip)
-        # return Response("Ok.", status=req.status_code)
-    # else:
-    #     return Response({"error": "Request failed"}, status=req.status_code)
-
-    return render(request, 'home/device_details.html', {'device': device})
-
-@api_view(['GET'])
-def external_api_switch_off(request,id):
-    device = Device.objects.get(device_id=id)
-    device_ip = device.ip
-
-    req = requests.get(f'http://{device_ip}:5000/switchOff')
-
-    if req.status_code == 200:
-        print('Status: ' + str(req) + ' IP: ' + device_ip)
-        # return Response("Ok.", status=req.status_code)
-    # else:
-    #     return Response({"error": "Request failed"}, status=req.status_code)
-
-    return render(request, 'home/device_details.html', {'device': device})
 
 @api_view(['POST'])
-def external_api_set_ip(request, object):
-    # device = Device.objects.get(device_id=id)
-    # device_ip = device.ip
-    print(object)
-    print(request.form)
+def external_api_create_wifi(request, id):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
+
+    object = {
+        'name': request.POST["wifi_ssid"],
+        'password': request.POST["wifi_pwd"]
+    }
+
+    try:
+        req = requests.post(f'http://{device_ip}:5000/createwifi', data=object)
+        print(req.status_code)
+
+        if req.status_code == 200:
+            data = req.text
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + data)
+            return JsonResponse("Created Successfully")
+        else:
+            print("Error: " + "Request failed")
+            return JsonResponse("Request failed", safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
+
+
+@api_view(['POST'])
+def external_api_set_ip(request, id):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
 
     payload = {
         'ip': request.POST.get("ip"),
@@ -223,42 +283,41 @@ def external_api_set_ip(request, object):
     }
     print(payload)
 
-    ip = request.form['ip']
-    subnet = request.form['subnet']
-    range1 = request.form['range1']
-    range2 = request.form['range2']
-    dns = request.form['dns']
+    # jsonList = json.dumps(payload, separators=(',', ':'))
 
-    req = requests.post(f'http://{ip}:5000/setip', data=payload)
+    try:
+        req = requests.post(f'http://{device_ip}:5000/setip', data=payload)
 
-@api_view(['POST'])
-def external_api_create_wifi(request, object):
+        if req.status_code == 200:
+            telemetries = req.text
+            print('Status: ' + str(req) + ' IP: ' + device_ip)
+            return JsonResponse("IP set")
+        else:
+            print("Error: " + "Request failed")
+            return JsonResponse("Request failed", safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
+
+
+@api_view(['GET'])
+def external_api_killnetwork(request, id):
     device = Device.objects.get(device_id=id)
     device_ip = device.ip
 
-    print(device_ip)
-    print(object)
+    try:
+        req = requests.get(f'http://{device_ip}:5000/killnetwork', timeout=3)
 
-    req = requests.post(f'http://{device_ip}:5000/createwifi', data=object)
-    print(req)
-
-    # return render(request, 'home/device_details.html', {'device': device})
-    return JsonResponse("Created Successfully", safe=False)
-
-@api_view(['POST'])
-def external_api_set_ip(request, id, object):
-    device = Device.objects.get(device_id=id)
-    device_ip = device.ip
-
-    req = requests.get(f'http://{device_ip}:5000/switchOff')
-
-    if req.status_code == 200:
-        print('Status: ' + str(req) + ' IP: ' + device_ip)
-        # return Response("Ok.", status=req.status_code)
-    # else:
-    #     return Response({"error": "Request failed"}, status=req.status_code)
-
-    return render(request, 'home/device_details.html', {'device': device})
+        if req.status_code == 200:
+            resp = req.text
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + resp)
+            return JsonResponse(resp)
+        else:
+            print("Error: " + "Request failed")
+            return JsonResponse("Request failed", safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
 
 
 @api_view(['GET'])
@@ -266,19 +325,22 @@ def external_api_get_info(request, id):
     device = Device.objects.get(device_id=id)
     device_ip = device.ip
 
-    req = requests.get(f'http://{device_ip}:5000/getinfo')
+    try:
+        req = requests.get(f'http://{device_ip}:5000/getinfo', timeout=5)
 
-    if req.status_code == 200:
-        print('Status: ' + str(req) + ' IP: ' + device_ip)
-        # return Response("Ok.", status=req.status_code)
-    else:
-        print("Error: "+"Request failed")
-    #     return Response({"error": "Request failed"}, status=req.status_code)
+        if req.status_code == 200:
+            telemetries = req.text
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA:' + telemetries)
+            return JsonResponse({"data": telemetries})
+        else:
+            print("Error: " + "Request failed")
+            return JsonResponse("Request failed", safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
 
-    return render(request, 'home/index.html', {'device': device})
 
-
-def createGraph(request,id):
+def createGraph(request, id):
     telemetries = Telemetry.objects.get(device_id=id)
     print(telemetries)
     device_ip = telemetries.device_id.ip
@@ -287,6 +349,5 @@ def createGraph(request,id):
 
     if req.status_code == 200:
         print('Status: ' + str(req) + ' IP: ' + device_ip)
-
 
     return render(request, 'home/device_details.html', {'data': telemetries})

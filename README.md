@@ -14,6 +14,16 @@
   
   Windows: 
   ```.venv\Scripts\activate```
+
+##
+  **INSTALL requirements**
+  ```
+   # to install the requirements
+   pip install -r requirements.txt
+
+   # to update the requirements
+   pip freeze > requirements.txt
+   ```
 ##
 
 ## Django

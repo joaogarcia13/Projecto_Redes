@@ -1,31 +1,30 @@
 from django.urls import path, re_path, include
 from . import views
 
-from django.conf.urls.static import static
-from django.conf import settings
-
 # URL Configs
 urlpatterns = [
     # The home page
     path('', views.index, name='index'),
-    path('devices/', views.index, name='home'),
+    path('devices', views.index, name='home'),
+    path('devices/new', views.formDevice),
     path('devices/<int:id>', views.device_details),
     path('login', views.login_view, name='login'),
     path('logout', views.logout_view, name='logout'),
+    path('map', views.map, name='map'),
     path('register', views.pages, name='register'),
-    path('devices/new', views.formDevice),
 
     # API
     path('api/devices', views.getDevice),
     path('api/devices/new', views.setDevice),
     path('api/devices/<int:id>/update', views.updateDevice),
     path('api/devices/<int:id>/delete', views.deleteDevice),
+    path('api/devices/polygons', views.drawDevices),
 
     # External API
-    path("devices/external/switch_on/<int:id>", views.external_api_switch_on),
-    path("devices/external/switch_off/<int:id>", views.external_api_switch_off),
+    path("devices/external/toggle_switch/<int:id>", views.external_api_toggle_switch),
     path("devices/external/setip/<int:id>", views.external_api_set_ip),
     path("devices/external/create_wifi/<int:id>", views.external_api_create_wifi),
+    path("devices/external/killnetwork/<int:id>", views.external_api_killnetwork),
     path("devices/external/getinfo/<int:id>", views.external_api_get_info),
 
     #Graphs

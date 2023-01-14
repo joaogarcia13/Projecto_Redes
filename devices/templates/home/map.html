@@ -1,0 +1,71 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Maps {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+
+    <div class="card card-plain">
+      <div class="card-header">Maps</div>
+      <div class="card-body">
+        <div id="map" class="map text-center"></div>
+      </div>
+    </div>
+
+    <div class="card card-plain" style="height:800px">
+      <div class="card-header">Blueprint</div>
+      <div class="card-body">
+        <div id="blueprint" class="text-center">
+          {% for floor in floors %}
+          <div class="card-tile"><h2>{{floor.name}}</h2></div>
+          <img id="map_img" src="{{floor.image}}" usemap="#mymap" alt="Mapa" loading="lazy" style="height:600px">
+          <map id="mymap" name="mymap">
+            <area shape="rect" coords="34, 44, 270, 350" href="/devices/3" />
+            <area id="circle" shape="circle" coords="50,50,50" href="#" />
+            <area shape="circle" coords="100,150,100" href="#" />
+            <area shape="circle" coords="380,600,20" href="#" />
+            <area shape="circle" coords="640,300,20" href="#" />
+          </map>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <!--  Google Maps Plugin    -->
+  <!-- Place this tag in your head or just before your close body tag. -->
+  <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script> -->
+
+  <script>
+    $(document).ready(function() {
+      //get_map_api();
+      setMap();
+      var areas = document.getElementsByTagName( 'area' );
+      for( var index = 0; index < areas.length; index++ ) {
+          areas[index].addEventListener( 'mouseover', function () {this.focus();}, false );
+          areas[index].addEventListener( 'mouseout', function () {this.blur();}, false );
+      };
+      $("#map_img").click(function(){
+        console.log('click');
+        GetCoordinates('map_img');
+      });
+    });
+  </script>
+{% endblock javascripts %}
+<style>
+  .overlays{
+    position:absolute;
+    z-index: 1;
+  }
+</style>

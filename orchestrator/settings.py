@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     # 3rd party apps
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     
     # My app
@@ -81,6 +82,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'orchestrator.wsgi.application'
 
+#Rest Framework Auth
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.TokenAuthentication',
+#         'rest_framework.authentication.BasicAuthentication',
+#         'rest_framework.authentication.SessionAuthentication',
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.permissions.IsAuthenticated',
+#     ),
+# }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://127.0.0.1:8000",
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases

@@ -15,7 +15,20 @@
         <div class="card card-chart device-card" id="device-{{device.device_id}}" device="{{device.device_id}}">
           <div class="card-header">
             <h3 class="card-category">{{ device.name }} ({{ device.mac_address }})</h3>
-            <h4 class="card-title"><i class="tim-icons icon-wifi text-primary"></i> <span id="device_ssid">{{ device.wifi_ssid }}</span></h4>
+
+            <div class="row">
+              <div class="col-lg-6">
+                <h4 class="card-title"><i class="tim-icons icon-wifi text-primary"></i> <span id="device_ssid">{{ device.wifi_ssid }}</span></h4>
+              </div>
+              <div class="col-lg-6">
+                <h4 class="card-title text-right">{{ device.ip }}</h4>
+              </div>
+            </div>
+<!--            {% if device.status %}-->
+<!--            <div><span>Ativo</span></div>-->
+<!--            {% else  %}-->
+<!--            <div><span>Inativo</span></div>-->
+<!--            {% endif  %}-->
           </div>
           <div class="card-body">
 
@@ -25,12 +38,8 @@
                   <img src="/static/assets/img/rpi01.png" style="width: 200px"/>
                 </div>
               </div>
-              <div class="col-lg-6">
-                {% if device.status %}
-                <li><b>Estado:</b> <span style="color: green">Ativo <icon class="tim-icons icon-check-2"></icon></span></li>
-                {% else  %}
-                <li><b>Estado:</b> <span style="color: red">Inativo <icon class="tim-icons icon-simple-remove"></icon></span></li>
-                {% endif  %}
+              <div class="col-lg-6" style="list-style-type:none">
+                <li><b>Estado:</b> <span class="status-word" style="font-weight: 400">-</span></li>
                 <li><b>Temperatura:</b> <span id="device_temp">-</span> ºC</li>
                 <li><b>CPU:</b> <span id="device_cpu">-</span> %</li>
                 <li><b>Memória:</b> <span id="device_mem">-</span> Mb</li>
@@ -75,11 +84,11 @@
 {% block javascripts %}
 <script type="text/javascript">
   $(document).ready(function() {
-    //clearAllTimers();
-    getInfo();
+    getInfo(); // First load of the page, then timer
+
     window.setInterval( function() {
       getInfo();
-    }, 10000);
+    }, 10000); // 10 secs
   });
 </script>
 {% endblock javascripts %}
