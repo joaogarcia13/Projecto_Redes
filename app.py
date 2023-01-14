@@ -58,7 +58,7 @@ def setIP():
     except:
         return "Erro: dns inválido"
         
-    if ipaddress.ip_address(range1) in ipaddress.ip_network(subnet+"/24"):
+    if  ip == "0.0.0.0":
         return "Erro: ip 0.0.0.0 não é valido"
     
     if ip == "127.0.0.1":
