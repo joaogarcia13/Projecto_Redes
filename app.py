@@ -121,11 +121,11 @@ def createRegraQoS():
 @app.route("/criarFiltroQoS", methods=['POST'])
 def createFiltroQoS():
     interface = request.form['interface']
-    filtro = request.form['filtro']
+    nameRule = request.form['nomeRegra']
     ip = request.form['ip']
 
     
-    subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', interface, ip, filtro])
+    subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', interface, ip, nameRule])
 
     #outinfo = {"interface": interface, "priority": , "filterHandle": , "filterType": "u32"}
 
@@ -142,12 +142,11 @@ def delRegraQoS():
 
 @app.route("/apagarFiltroQoS", methods=['POST'])
 def delFiltroQoS():
-    interface = request.form['interface']
     priority = request.form['priority']
     filterHandle = request.form['filterHandle']
     filterType = request.form['filterType']
 
-    subprocess.Popen(['nohup', 'sh', 'qos/apagarFiltro.sh', interface, priority, filterHandle, filterType])
+    subprocess.Popen(['nohup', 'sh', 'qos/apagarFiltro.sh', 'wlan0', priority, filterHandle, filterType])
 
     return "Filtro apagado"
 
@@ -155,30 +154,26 @@ def delFiltroQoS():
 #Firewall
 @app.route("/criarRegraFirewall", methods=['POST'])
 def criarRegraFirewall():
-    interface = request.form['interface']
     tipo = request.form['tipo']
     ipPort = request.form['ipPort']
 
-    subprocess.Popen(['nohup', 'sh', 'firewall/criarRegra.sh', interface, tipo, ipPort])
+    subprocess.Popen(['nohup', 'sh', 'firewall/criarRegra.sh', 'wlan0', tipo, ipPort])
 
     return "Regra criada"
 
 @app.route("/apagarRegraFirewall", methods=['POST'])
 def apagarRegraFirewall():
-    interface = request.form['interface']
     tipo = request.form['tipo']
     ipPort = request.form['ipPort']
 
-    subprocess.Popen(['nohup', 'sh', 'firewall/criarRegra.sh', interface, tipo, ipPort])
+    subprocess.Popen(['nohup', 'sh', 'firewall/criarRegra.sh', 'wlan0', tipo, ipPort])
 
     return "Regra apagada"
 
 #Monitoring
-@app.route("/monitoring", methods=['POST'])
+@app.route("/monitoring", methods=['GET'])
 def monitoring() :
-    interface = request.form['interface']
-
-    device = subprocess.check_output(['nohup', 'sh', 'networkManager/monitoring.sh', interface])
+    device = subprocess.check_output(['nohup', 'sh', 'networkManager/monitoring.sh', 'wlan0'])
 
     return str(device)
 
