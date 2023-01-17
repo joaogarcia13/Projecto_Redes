@@ -124,10 +124,9 @@ def createFiltroQoS():
     
     subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', 'wlan0', ip, nameRule])
 
-    #outinfo = {"interface": interface, "priority": , "filterHandle": , "filterType": "u32"}
+    outinfo = {"interface": "wlan0", "priority": "...", "filterHandle": "...", "filterType": "u32"}
 
-    #return json.dumps(outinfo)
-    return "filtro criado"
+    return json.dumps(outinfo)
 
 @app.route("/apagarRegraQoS", methods=['POST'])
 def delRegraQoS():
