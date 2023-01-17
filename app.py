@@ -107,24 +107,22 @@ def getinfo():
 #QoS
 @app.route("/criarRegraQoS", methods=['POST'])
 def createRegraQoS():
-    interface = request.form['interface']
     name = request.form['name']
     velocidadeRedeBusy = request.form['velocidadeLimitada']
     velocidadeNormal = request.form['velocidadeNormal']
 
     
-    subprocess.Popen(['nohup', 'sh', 'qos/criarRegra.sh', interface, name, velocidadeRedeBusy, velocidadeNormal])
+    subprocess.Popen(['nohup', 'sh', 'qos/criarRegra.sh', 'wlan0', name, velocidadeRedeBusy, velocidadeNormal])
 
     return "Regra criada"
 
 @app.route("/criarFiltroQoS", methods=['POST'])
 def createFiltroQoS():
-    interface = request.form['interface']
     nameRule = request.form['nomeRegra']
     ip = request.form['ip']
 
     
-    subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', interface, ip, nameRule])
+    subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', 'wlan0', ip, nameRule])
 
     #outinfo = {"interface": interface, "priority": , "filterHandle": , "filterType": "u32"}
 
