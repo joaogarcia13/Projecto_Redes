@@ -121,10 +121,9 @@ def createFiltroQoS():
     nameRule = request.form['nomeRegra']
     ip = request.form['ip']
 
-    
-    subprocess.Popen(['nohup', 'sh', 'qos/criarFiltro.sh', 'wlan0', ip, nameRule])
+    infoFiltro = subprocess.check_output(['nohup', 'sh', 'qos/criarFiltro.sh', 'wlan0', ip, nameRule])
 
-    outinfo = {"interface": "wlan0", "priority": "...", "filterHandle": "...", "filterType": "u32"}
+    outinfo = {"interface": "wlan0", "priority": str(infoFiltro[0]), "filterHandle": str(infoFiltro[1]), "filterType": str(infoFiltro[2])}
 
     return json.dumps(outinfo)
 
