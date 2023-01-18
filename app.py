@@ -123,7 +123,8 @@ def createFiltroQoS():
 
     infoFiltro = subprocess.check_output(['nohup', 'sh', 'qos/criarFiltro.sh', 'wlan0', ip, nameRule])
 
-    outinfo = {"interface": "wlan0", "priority": str(infoFiltro[0]), "filterHandle": str(infoFiltro[1]), "filterType": str(infoFiltro[2])}
+    infoFiltroArr = infoFiltro.decode().split("-")
+    outinfo = {"interface": "wlan0", "priority": str(infoFiltroArr[0]), "filterHandle": str(infoFiltroArr[1]), "filterType": str(infoFiltroArr[2])}
 
     return json.dumps(outinfo)
 
