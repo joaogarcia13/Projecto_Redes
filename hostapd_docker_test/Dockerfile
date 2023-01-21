@@ -15,6 +15,6 @@ COPY pi_REST ./pi_REST
 COPY qos ./qos
 COPY app.py .
 COPY updatePi.sh .
-RUN echo "1" > /proc/sys/net/ipv4/ip_forward
+CMD echo "1" > /proc/sys/net/ipv4/ip_forward
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
 
