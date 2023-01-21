@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:22.04
 RUN apt-get update && apt-get upgrade
 RUN apt-get install net-tools
 RUN apt-get -y install python3
