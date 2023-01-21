@@ -11,7 +11,7 @@ subnet $2 netmask 255.255.255.0 {
 }
 " > dhcp.conf #adicionar a string as subnets
 
-echo "sudo ifconfig wlan0 $1/24 up
+echo "ifconfig wlan0 $1/24 up
 #iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 iptables-nft -t nat -C POSTROUTING -o eth0 -j MASQUERADE || iptables-nft -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 iptables-nft -C FORWARD -i eth0 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT || iptables-nft -A FORWARD -i eth0 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
