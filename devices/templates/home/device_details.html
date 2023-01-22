@@ -327,8 +327,6 @@
       </div>
     </div>
 
-    <!-- Tasks -->
-
     <!-- Charts -->
     <div class="row">
       <div class="col-lg-12">
@@ -344,6 +342,112 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Other commands (QoS + Firewall) -->
+    <div class="row">
+
+      <!-- Quality of Service -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header ">
+            <h4 class="card-title">QoS Rules</h4>
+          </div>
+          <div class="card-body">
+            <form role="form" method="post" action="" id="qos_rules">
+              {% csrf_token %}
+              <div class="col-12">
+                  <div class="form-group">
+                      <label>Rule Name</label>
+                      <input type="text" id="qos_name" name="qos_name" class="form-control" value="1:20">
+                  </div>
+              </div>
+              <div class="col-12">
+                  <div class="form-group">
+                      <label>qos_max_speed</label>
+                      <input type="text" id="qos_max_speed" name="qos_max_speed" class="form-control" value="2">
+                  </div>
+              </div>
+              <div class="col-12">
+                  <div class="form-group">
+                      <label>qos_normal_speed</label>
+                      <input type="text" id="qos_normal_speed" name="qos_normal_speed" class="form-control" value="5">
+                  </div>
+              </div>
+            </form>
+            <div class="col-12 text-center">
+              <div class="btn btn-sm btn-primary" onclick="create_wifi_api({{device.device_id}})">
+                <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
+                  <span>SAVE</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header ">
+            <h4 class="card-title">QoS Filters</h4>
+          </div>
+          <div class="card-body">
+            <form role="form" method="post" action="" id="qos_filters">
+              {% csrf_token %}
+              <div class="col-12">
+                  <div class="form-group">
+                      <label>IP</label>
+                      <input type="text" id="qos_ip" name="qos_ip" class="form-control" value="{{device.ip}}">
+                  </div>
+              </div>
+              <div class="col-12">
+                  <div class="form-group">
+                      <label>Rule Name</label>
+                      <input type="text" id="qos_rule" name="qos_rule" class="form-control" value="1:20">
+                  </div>
+              </div>
+            </form>
+            <div class="col-12 text-center">
+              <div class="btn btn-sm btn-primary" onclick="create_wifi_api({{device.device_id}})">
+                <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
+                  <span>SAVE</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Firewall -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header ">
+            <h4 class="card-title">Firewall Rules</h4>
+          </div>
+          <div class="card-body">
+            <form role="form" method="post" action="" id="firewall">
+              {% csrf_token %}
+              <div class="col-12">
+                  <div class="form-group">
+                      <label>Firewall Type</label>
+                      <input type="text" id="firewall_type" name="firewall_type" class="form-control" value="port">
+                  </div>
+              </div>
+              <div class="col-12">
+                  <div class="form-group">
+                      <label>firewall_port</label>
+                      <input type="text" id="firewall_port" name="firewall_port" class="form-control" value="80">
+                  </div>
+              </div>
+            </form>
+            <div class="col-12 text-center">
+              <div class="btn btn-sm btn-primary" onclick="create_wifi_api({{device.device_id}})">
+                <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
+                  <span>SAVE</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
     </div>
 
 {% endblock content %}

@@ -9,5 +9,6 @@ class DeviceForm(forms.Form):
     mac_address = forms.CharField(max_length=30)
     wifi_ssid = forms.CharField(max_length=100)
     wifi_pwd = forms.CharField(max_length=30)
+    coordinates = forms.CharField(max_length=30)
     type = forms.CharField(max_length=30)
     status = forms.BooleanField(required=False)

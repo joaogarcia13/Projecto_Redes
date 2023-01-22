@@ -28,6 +28,7 @@ from rest_framework.authtoken.models import Token
 Copyright (c) 2019 - present AppSeed.us
 """
 
+
 # --- PAGES
 def logout_view(request):
     logout(request)
@@ -228,19 +229,17 @@ def external_api_toggle_switch(request, id):
     device_ip = device.ip
 
     switch_command = request.GET["data"]
-    obj = {
-        "action": switch_command
-    }
+    obj = {"action": switch_command}
     try:
         req = requests.post(f'http://{device_ip}:5000/toggleSwitch', data=obj)
         if req.status_code == 200:
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
-            return JsonResponse("Switch set")
+            return JsonResponse({"data": "Switch set", "status": req.status_code})
         else:
-            return JsonResponse({"Error": "Request failed"}, status=req.status_code)
+            return JsonResponse({"data": "Request failed", "status": req.status_code})
     except Exception as e:
         print(f'Unable to connect to {device_ip}')
-        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
 
 
 @api_view(['POST'])
@@ -260,13 +259,13 @@ def external_api_create_wifi(request, id):
         if req.status_code == 200:
             data = req.text
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + data)
-            return JsonResponse("Created Successfully")
+            return JsonResponse({"data": "Created Successfully", "status": req.status_code}, safe=False)
         else:
             print("Error: " + "Request failed")
-            return JsonResponse("Request failed", safe=False)
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
     except Exception as e:
         print(f'Unable to connect to {device_ip}')
-        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
 
 
 @api_view(['POST'])
@@ -291,13 +290,13 @@ def external_api_set_ip(request, id):
         if req.status_code == 200:
             telemetries = req.text
             print('Status: ' + str(req) + ' IP: ' + device_ip)
-            return JsonResponse("IP set")
+            return JsonResponse({"data": "IP set", "status": req.status_code}, safe=False)
         else:
             print("Error: " + "Request failed")
-            return JsonResponse("Request failed", safe=False)
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
     except Exception as e:
         print(f'Unable to connect to {device_ip}')
-        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
 
 
 @api_view(['GET'])
@@ -314,10 +313,10 @@ def external_api_killnetwork(request, id):
             return JsonResponse(resp)
         else:
             print("Error: " + "Request failed")
-            return JsonResponse("Request failed", safe=False)
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
     except Exception as e:
         print(f'Unable to connect to {device_ip}')
-        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
 
 
 @api_view(['GET'])
@@ -326,18 +325,18 @@ def external_api_get_info(request, id):
     device_ip = device.ip
 
     try:
-        req = requests.get(f'http://{device_ip}:5000/getinfo', timeout=5)
+        req = requests.get(f'http://{device_ip}:5000/getinfo', timeout=3)
 
         if req.status_code == 200:
             telemetries = req.text
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA:' + telemetries)
-            return JsonResponse({"data": telemetries})
+            return JsonResponse({"data": telemetries, "status": req.status_code})
         else:
             print("Error: " + "Request failed")
-            return JsonResponse("Request failed", safe=False)
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
     except Exception as e:
         print(f'Unable to connect to {device_ip}')
-        return JsonResponse(f"Unable to connect to {device_ip}'", safe=False)
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
 
 
 def createGraph(request, id):

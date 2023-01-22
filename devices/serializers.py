@@ -5,7 +5,7 @@ from devices.models import Device, Telemetry, Floor, Device_Floor
 class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
-        fields = ('device_id', 'name', 'ip', 'mac_address', 'wifi_ssid', 'wifi_pwd', 'type', 'status')
+        fields = ('device_id', 'name', 'ip', 'mac_address', 'wifi_ssid', 'wifi_pwd', 'type', 'coordinates', 'status')
 
 
 class FloorSerializer(serializers.ModelSerializer):

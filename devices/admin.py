@@ -7,9 +7,9 @@ from devices.models import Device, Floor, Device_Floor
 # Create a custom admin class
 class DeviceAdmin(admin.ModelAdmin):
     # Set the fields to display on the list page
-    list_display = ('device_id', 'name', 'ip', 'mac_address', 'wifi_ssid', 'wifi_pwd', 'type', 'status')  # display fields on admin
+    list_display = ('device_id', 'name', 'ip', 'mac_address', 'wifi_ssid', 'wifi_pwd', 'type', 'coordinates', 'status')  # display fields on admin
     # Set the fields to be editable on the form page
-    fields = ('name', 'ip', 'mac_address', 'wifi_ssid', 'wifi_pwd', 'type', 'status')  # removed "device_id" field because it's auto-incremented
+    fields = ('name', 'ip', 'mac_address', 'wifi_ssid', 'wifi_pwd', 'type', 'coordinates', 'status')  # removed "device_id" field because it's auto-incremented
 
 
 class FloorAdmin(admin.ModelAdmin):

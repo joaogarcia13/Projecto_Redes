@@ -10,6 +10,7 @@ class Device(models.Model):
     wifi_ssid = models.CharField(max_length=100, null=True)
     wifi_pwd = models.CharField(max_length=30, null=True)
     type = models.CharField(max_length=30, null=True)
+    coordinates = models.CharField(max_length=30, null=True)
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -39,3 +40,9 @@ class Device_Floor(models.Model):
     shape = models.CharField(max_length=250)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+# class QoS_Rules(models.Model):
+#     name
+#     priority
+#     filter handle
+#     filter type
