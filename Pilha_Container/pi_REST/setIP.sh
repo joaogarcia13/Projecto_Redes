@@ -14,7 +14,7 @@ subnet $2 netmask 255.255.255.0 {
 echo "ifconfig wlan0 $1/24 up
 ip link set wlan0 up
 ip addr flush dev wlan0
-ip addr add $1/24 dev wlan
+ip addr add $1/24 dev wlan0
 #iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 iptables -t nat -C POSTROUTING -o eth0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
