@@ -9,7 +9,6 @@ RUN apt-get -y install hostapd
 RUN apt-get -y install isc-dhcp-server
 RUN apt-get -y install iptables
 RUN apt-get -y install ufw
-RUN systemctl enable ufw --now
 RUN apt-get -y install iproute2
 EXPOSE 5000
 COPY firewall ./firewall
