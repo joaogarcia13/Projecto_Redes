@@ -1,4 +1,4 @@
 #!/bin/bash
 
-sudo pkill hostapd
-sudo pkill dhcpd
+pkill hostapd
+pkill dhcpd
