@@ -16,5 +16,6 @@ COPY qos ./qos
 COPY app.py .
 COPY updatePi.sh .
 CMD echo "1" > /proc/sys/net/ipv4/ip_forward
+CMD touch /var/lib/dhcp/dhcp.leases
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
 
