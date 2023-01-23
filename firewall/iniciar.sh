@@ -1,8 +1,5 @@
 #!/bin/bash
 
-cp conf/sysctl.conf /etc/ufw/sysctl.conf
-cp conf/before.rules /etc/ufw/before.rules
-
 ufw default allow routed
 ufw default deny incoming
 ufw default deny outgoing

@@ -18,6 +18,8 @@ COPY pi_REST ./pi_REST
 COPY qos ./qos
 COPY app.py .
 COPY updatePi.sh .
+COPY firewall/conf/sysctl.conf /etc/ufw/sysctl.conf
+COPY firewall/conf/before.rules /etc/ufw/before.rules
 CMD echo "1" > /proc/sys/net/ipv4/ip_forward
 COPY dhcpd.leases /var/lib/dhcp/dhcpd.leases
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
