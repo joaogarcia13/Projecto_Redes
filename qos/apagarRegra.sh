@@ -1,1 +1,3 @@
-sudo tc class del dev wlan0 classid $1
+#!/bin/bash
+
+tc class del dev wlan0 classid $1

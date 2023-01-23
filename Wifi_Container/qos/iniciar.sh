@@ -1,3 +1,5 @@
+#!/bin/bash
+
 tc qdisc del dev $1 root
 
 tc qdisc add dev $1 root handle 1:0 htb default 30 

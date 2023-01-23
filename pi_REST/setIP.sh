@@ -16,3 +16,4 @@ sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 sudo dhcpd -cf dhcp.conf wlan0
 echo 'dhcp started'" > pi_REST/init-network.sh
 
+echo "ifconfig wlan0 $1/24 down" > pi_REST/switchoff.sh

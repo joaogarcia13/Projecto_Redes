@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [$# -eq 1];
 then
     tc filter del dev $1
