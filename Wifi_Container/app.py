@@ -2,6 +2,7 @@ from flask import Flask, request
 import subprocess
 import ipaddress
 import json
+import time
 
 app = Flask(__name__)
 
@@ -76,6 +77,7 @@ def setIP():
     else:
         subprocess.Popen(['nohup', 'sh', 'pi_REST/setIP.sh', ip, subnet, range1, range2, dns])
 
+        time.sleep(3)
         subprocess.Popen(['nohup','sh','pi_REST/init-network.sh'])
 
     return "IP definido"
