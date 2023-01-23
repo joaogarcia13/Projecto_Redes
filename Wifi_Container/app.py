@@ -2,7 +2,6 @@ from flask import Flask, request
 import subprocess
 import ipaddress
 import json
-import time
 
 app = Flask(__name__)
 
@@ -75,9 +74,9 @@ def setIP():
         return "Erro: range1 maior que range2"
     
     else:
-        subprocess.Popen(['nohup', 'sh', 'pi_REST/setIP.sh', ip, subnet, range1, range2, dns])
+        p1 = subprocess.Popen(['nohup', 'sh', 'pi_REST/setIP.sh', ip, subnet, range1, range2, dns])
+        p1.wait()
 
-        time.sleep(3)
         subprocess.Popen(['nohup','sh','pi_REST/init-network.sh'])
 
     return "IP definido"
@@ -164,7 +163,7 @@ def apagarRegraFirewall():
     tipo = request.form['tipo']
     ipPort = request.form['ipPort']
 
-    subprocess.Popen(['nohup', 'sh', 'firewall/criarRegra.sh', 'wlan0', tipo, ipPort])
+    subprocess.Popen(['nohup', 'sh', 'firewall/apagarRegra.sh', 'wlan0', tipo, ipPort])
 
     return "Regra apagada"
 

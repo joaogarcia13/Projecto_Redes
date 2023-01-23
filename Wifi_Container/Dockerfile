@@ -4,6 +4,7 @@ RUN apt-get upgrade
 RUN apt-get install net-tools
 RUN apt-get -y install python3
 RUN apt-get -y install pip
+RUN apt-get -y install arp-scan
 RUN pip install Flask
 RUN apt-get -y install hostapd
 RUN apt-get -y install isc-dhcp-server
