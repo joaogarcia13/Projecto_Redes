@@ -18,7 +18,7 @@
 
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table tablesorter " id="">
+              <table class="table tablesorter " id="device_table">
                 <thead class=" text-primary">
                   <tr>
                     <th>Name</th>
@@ -47,50 +47,41 @@
             </div>
           </div> <!-- end of card-body -->
 
-    <!-- Buttons -->
-<!--    <div class="row">-->
-      <!--<div class="dropdown">
-        <button type="button" class="btn btn-link dropdown-toggle btn-icon" data-toggle="dropdown">
-          <i class="tim-icons icon-settings-gear-63"></i>
-        </button>
-      </div>-->
-
-      <!-- Buttons -->
-      <div class="row">
-        <div class="col-md-6">
-          <div style="text-align: left">
-            <div class="btn btn-sm btn-primary" onclick="showConfig()">
-              <icon class="tim-icons icon-settings-gear-63"></icon>
-              <button style="width: 80px; height: 25px" type="button" class="btn btn-link btn-icon">
-                <span>CONFIG</span>
-              </button>
+          <!-- Buttons -->
+          <div class="row">
+            <div class="col-md-6">
+              <div style="text-align: left">
+                <div class="btn btn-sm btn-primary" onclick="showConfig()">
+                  <icon class="tim-icons icon-settings-gear-63"></icon>
+                  <button style="width: 80px; height: 25px" type="button" class="btn btn-link btn-icon">
+                    <span>CONFIG</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div style="text-align: right">
+                <div class="btn btn-sm btn-primary" onclick="showEdit()">
+                  <i class="tim-icons icon-pencil"></i>
+                  <button style="width: 80px; height: 25px" type="button" class="btn btn-link btn-icon">
+                    <span>EDIT</span>
+                  </button>
+                </div>
+                <!--<div class="btn btn-sm btn-primary active">
+                  <i class="tim-icons icon-check-2"></i>
+                  <button style="width: 80px; height: 25px" type="button" class="btn btn-link btn-icon">
+                    <span>SAVE</span>
+                  </button>
+                </div>-->
+                <div class="btn btn-sm btn-primary">
+                  <i class="tim-icons icon-trash-simple"></i>
+                  <button style="width: 80px; height: 25px" type="button" class="btn btn-link btn-icon">
+                    <span>DELETE</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="col-md-6">
-          <div style="text-align: right">
-            <div class="btn btn-sm btn-primary" onclick="showEdit()">
-              <i class="tim-icons icon-pencil"></i>
-              <button style="width: 80px; height: 25px" type="button" class="btn btn-link btn-icon">
-                <span>EDIT</span>
-              </button>
-            </div>
-            <!--<div class="btn btn-sm btn-primary active">
-              <i class="tim-icons icon-check-2"></i>
-              <button style="width: 80px; height: 25px" type="button" class="btn btn-link btn-icon">
-                <span>SAVE</span>
-              </button>
-            </div>-->
-            <div class="btn btn-sm btn-primary">
-              <i class="tim-icons icon-trash-simple"></i>
-              <button style="width: 80px; height: 25px" type="button" class="btn btn-link btn-icon">
-                <span>DELETE</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-<!--    </div> &lt;!&ndash; end of row &ndash;&gt;-->
 
         </div>
       </div>
@@ -344,6 +335,48 @@
       </div>
     </div>
 
+
+    <div class="row">
+      <!-- Rules Table -->
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3>Quality of Service</h3>
+            <h4 class="card-title">Rules for <b>{{device.ip}}</b></h4>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table tablesorter" id="qos_rules_table">
+                <thead class=" text-primary">
+                  <tr>
+                    <th>Device</th>
+                    <th>Rule Name</th>
+                    <th>Max Speed</th>
+                    <th>Normal Speed</th>
+                    <th>Filter IP</th>
+                    <th>Rule Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for rule in qos_rules %}
+                  <tr>
+                    <td>{{rule.device.name}}</td>
+                    <td id="qos_list_name">{{rule.rule_name}}</td>
+                    <td>{{rule.max_speed}}</td>
+                    <td>{{rule.normal_speed}}</td>
+                    <td>{{rule.device.ip}}</td><!-- <td>{{qos_filters.ip}}</td>-->
+                    <td>{{rule.created_at}}</td>
+                    <td onclick="remove_rule_qos({{device.device_id}},{{rule.id}},'{{rule.rule_name}}')" style="cursor: pointer;"><icon class="tim-icons icon-simple-remove"></icon></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- end of row -->
+
     <!-- Other commands (QoS + Firewall) -->
     <div class="row">
 
@@ -364,21 +397,21 @@
               </div>
               <div class="col-12">
                   <div class="form-group">
-                      <label>qos_max_speed</label>
+                      <label>QoS Max Speed</label>
                       <input type="text" id="qos_max_speed" name="qos_max_speed" class="form-control" value="2">
                   </div>
               </div>
               <div class="col-12">
                   <div class="form-group">
-                      <label>qos_normal_speed</label>
+                      <label>QoS Normal Speed</label>
                       <input type="text" id="qos_normal_speed" name="qos_normal_speed" class="form-control" value="5">
                   </div>
               </div>
             </form>
             <div class="col-12 text-center">
-              <div class="btn btn-sm btn-primary" onclick="create_wifi_api({{device.device_id}})">
+              <div class="btn btn-sm btn-primary" onclick="add_rule_qos({{device.device_id}})">
                 <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
-                  <span>SAVE</span>
+                  <span>ADD RULE</span>
                 </a>
               </div>
             </div>
@@ -406,9 +439,9 @@
               </div>
             </form>
             <div class="col-12 text-center">
-              <div class="btn btn-sm btn-primary" onclick="create_wifi_api({{device.device_id}})">
+              <div class="btn btn-sm btn-primary" onclick="add_filter_qos({{device.device_id}})">
                 <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
-                  <span>SAVE</span>
+                  <span>ADD FILTER</span>
                 </a>
               </div>
             </div>
@@ -433,21 +466,21 @@
               </div>
               <div class="col-12">
                   <div class="form-group">
-                      <label>firewall_port</label>
+                      <label>Firewall Port</label>
                       <input type="text" id="firewall_port" name="firewall_port" class="form-control" value="80">
                   </div>
               </div>
             </form>
             <div class="col-12 text-center">
-              <div class="btn btn-sm btn-primary" onclick="create_wifi_api({{device.device_id}})">
+              <div class="btn btn-sm btn-primary" onclick="add_rule_firewall({{device.device_id}})">
                 <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
-                  <span>SAVE</span>
+                  <span>ADD RULE</span>
                 </a>
               </div>
             </div>
           </div>
         </div>
-
+      </div>
     </div>
 
 {% endblock content %}

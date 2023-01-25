@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from devices.models import Device, Telemetry, Floor, Device_Floor
+from devices.models import Device, Telemetry, Floor, Device_Floor, QoS_Rules, QoS_Filters, Firewall
 
 
 class DeviceSerializer(serializers.ModelSerializer):
@@ -18,3 +18,21 @@ class Device_Floor_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Device_Floor
         fields = ('idDevice', 'idFloor', 'draw', 'shape')
+
+
+class QoS_Rules_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = QoS_Rules
+        fields = ('id', 'device', 'rule_name', 'max_speed', 'normal_speed')
+
+
+class QoS_Filters_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = QoS_Filters
+        fields = ('id', 'rule', 'ip')
+
+
+class Firewall_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Firewall
+        fields = ('id', 'type', 'port')

@@ -351,18 +351,23 @@ function kill_network_api(id) {
     });
 }
 
-function qos_rules_api(id) {
+function add_rule_qos(id) {
     var obj = {
         'name': document.getElementById("qos_name").value,
-        'qos_normal_speed': document.getElementById("qos_normal_speed").value
+        'max_speed': document.getElementById("qos_max_speed").value,
+        'normal_speed': document.getElementById("qos_normal_speed").value
     }
+    var $crf_token = $('#qos_rules [name="csrfmiddlewaretoken"]').attr('value');
+
     $.ajax({
-        url: '/devices/external/toggle_switch/'+id,
-        type: 'GET',
-        data: {'data': command},
+        url: '/devices/external/qos/new_rule/'+id,
+        type: 'POST',
+        data: obj,
+        headers: {"X-CSRFToken": $crf_token},
         success: function(response) {
             if (response.status == 200) {
-                showNotification('top','center','tim-icons icon-check-2','success','Switch '+command+' successful');
+                showNotification('top','center','tim-icons icon-check-2','success',response.data);
+                location.reload();
             }
             else {
                 showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
@@ -372,6 +377,85 @@ function qos_rules_api(id) {
             showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
         }
     });
+}
+function add_filter_qos(id) {
+    var obj = {
+        'ip': document.getElementById("qos_ip").value,
+        'rule_name': document.getElementById("qos_rule").value
+    }
+    var $crf_token = $('#qos_filters [name="csrfmiddlewaretoken"]').attr('value');
+
+    $.ajax({
+        url: '/devices/external/qos/new_filter/'+id,
+        type: 'POST',
+        data: obj,
+        headers: {"X-CSRFToken": $crf_token},
+        success: function(response) {
+            if (response.status == 200) {
+                showNotification('top','center','tim-icons icon-check-2','success',response.data);
+            }
+            else {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
+        }
+    });
+}
+function add_rule_firewall(id) {
+    var obj = {
+        'type': document.getElementById("firewall_type").value,
+        'port': document.getElementById("firewall_port").value
+    }
+    var $crf_token = $('#firewall [name="csrfmiddlewaretoken"]').attr('value');
+
+    $.ajax({
+        url: '/devices/external/firewall/new_rule/'+id,
+        type: 'POST',
+        data: obj,
+        headers: {"X-CSRFToken": $crf_token},
+        success: function(response) {
+            if (response.status == 200) {
+                showNotification('top','center','tim-icons icon-check-2','success',response.data);
+            }
+            else {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
+        }
+    });
+}
+function remove_rule_qos(device_id, rule_id, rule_name) {
+    var text = "Delete rule?";
+    if (confirm(text) == true) {
+        var obj = {
+            'rule_id': rule_id,
+            'name': rule_name,
+        }
+        var $crf_token = $('#qos_rules [name="csrfmiddlewaretoken"]').attr('value');
+
+        $.ajax({
+            url: '/devices/external/qos/delete_rule/'+device_id,
+            type: 'POST',
+            data: obj,
+            headers: {"X-CSRFToken": $crf_token},
+            success: function(response) {
+                if (response.status == 200) {
+                    showNotification('top','center','tim-icons icon-check-2','success',response.data);
+                    location.reload();
+                }
+                else {
+                    showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
+            }
+        });
+    }
 }
 
 function getDataGraph(){

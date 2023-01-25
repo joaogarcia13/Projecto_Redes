@@ -41,8 +41,29 @@ class Device_Floor(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-# class QoS_Rules(models.Model):
-#     name
-#     priority
-#     filter handle
-#     filter type
+
+class QoS_Rules(models.Model):
+    id = models.AutoField(primary_key=True, auto_created=True, unique=True)
+    # name = models.CharField(max_length=250) # nome da regra é para ser legivel ao cliente
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)  # chave estrangeira do dispositivo
+    rule_name = models.CharField(max_length=100)
+    max_speed = models.CharField(max_length=100)
+    normal_speed = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class QoS_Filters(models.Model):
+    id = models.AutoField(primary_key=True, auto_created=True, unique=True)
+    rule = models.ForeignKey(QoS_Rules, on_delete=models.CASCADE)  # chave estrangeira da regra
+    ip = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class Firewall(models.Model):
+    id = models.AutoField(primary_key=True, auto_created=True, unique=True)
+    type = models.CharField(max_length=250)
+    port = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

@@ -9,9 +9,9 @@ from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http.response import JsonResponse
 
-from devices.models import Device, Telemetry, Floor, Device_Floor
+from devices.models import Device, Telemetry, Floor, Device_Floor, QoS_Rules, QoS_Filters, Firewall
 from devices.forms import DeviceForm
-from devices.serializers import DeviceSerializer, FloorSerializer, Device_Floor_Serializer
+from devices.serializers import DeviceSerializer, Device_Floor_Serializer, QoS_Rules_Serializer, QoS_Filters_Serializer, Firewall_Serializer
 from django.core.files import File
 from django.core.files.storage import default_storage
 
@@ -80,7 +80,19 @@ def index(request):
 @login_required(login_url='/login')
 def device_details(request, id):
     device = Device.objects.get(device_id=id)
-    return render(request, 'home/device_details.html', {'device': device})
+    qos_rules = QoS_Rules.objects.all().filter(device=id)
+    # qos_filters = QoS_Filters.objects.all().filter(rule=qos_rules.id)
+
+    # for rule in qos_rules:
+    #     print(rule.id)
+
+    obj_render = {
+        'device': device,
+        'qos_rules': qos_rules,
+        # 'qos_filters': qos_filters
+    }
+
+    return render(request, 'home/device_details.html', obj_render)
 
 
 @login_required(login_url='/login')
@@ -234,9 +246,9 @@ def external_api_toggle_switch(request, id):
         req = requests.post(f'http://{device_ip}:5000/toggleSwitch', data=obj)
         if req.status_code == 200:
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
-            return JsonResponse({"data": "Switch set", "status": req.status_code})
+            return JsonResponse({"data": "Switch set", "status": req.status_code}, safe=False)
         else:
-            return JsonResponse({"data": "Request failed", "status": req.status_code})
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
     except Exception as e:
         print(f'Unable to connect to {device_ip}')
         return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
@@ -300,7 +312,7 @@ def external_api_set_ip(request, id):
 
 
 @api_view(['GET'])
-def external_api_killnetwork(request, id):
+def external_api_kill_network(request, id):
     device = Device.objects.get(device_id=id)
     device_ip = device.ip
 
@@ -337,6 +349,168 @@ def external_api_get_info(request, id):
     except Exception as e:
         print(f'Unable to connect to {device_ip}')
         return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
+
+
+@api_view(['POST'])
+def external_api_add_qos_rule(request, id):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
+
+    qos_rule_name = request.POST["name"]
+    qos_rule_max_speed = request.POST["max_speed"]
+    qos_rule_normal_speed = request.POST["normal_speed"]
+    obj = {
+        "name": qos_rule_name,
+        "velocidadeLimitada": qos_rule_max_speed,
+        "velocidadeNormal": qos_rule_normal_speed
+    }
+
+    try:
+        req = requests.post(f'http://{device_ip}:5000/criarRegraQoS', data=obj)
+
+        if req.status_code == 200:
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
+
+            add_qos = {
+                "rule_name": qos_rule_name,
+                "device": device.device_id,
+                "max_speed": qos_rule_max_speed,
+                "normal_speed": qos_rule_normal_speed
+            }
+            # add QoS to database
+            added_qos = add_qos_rule_db(add_qos)
+            if added_qos.status_code == 200:
+                return JsonResponse({"data": "QoS Rule created + Added to Database", "status": req.status_code}, safe=False)
+
+            return JsonResponse({"data": "QoS Rule created", "status": req.status_code}, safe=False)
+        else:
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
+@api_view(['POST'])
+def external_api_remove_qos_rule(request, id):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
+
+    qos_rule_id = request.POST["rule_id"]
+    qos_rule_name = request.POST["name"]
+    obj = {
+        "name": qos_rule_name
+    }
+
+    try:
+        req = requests.post(f'http://{device_ip}:5000/apagarRegraQoS', data=obj)
+        if req.status_code == 200:
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
+
+            # add QoS to database
+            removed_qos = remove_qos_rule_db(qos_rule_id)
+            if removed_qos != 200:
+                return JsonResponse({"data": "Failed to delete from database", "status": req.status_code}, safe=False)
+
+            return JsonResponse({"data": "QoS Rule deleted", "status": req.status_code}, safe=False)
+        else:
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
+
+
+@api_view(['POST'])
+def external_api_add_qos_filter(request, id):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
+
+    qos_filter_ip = request.POST["ip"]
+    qos_filter_rule_name = request.POST["rule_name"]
+    obj = {
+        "ip": qos_filter_ip,
+        "nomeRegra": qos_filter_rule_name,
+    }
+
+    try:
+        req = requests.post(f'http://{device_ip}:5000/criarFiltroQoS', data=obj)
+        if req.status_code == 200:
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
+            # TODO: ADD TO DATABASE
+            return JsonResponse({"data": "QoS Filter created", "status": req.status_code}, safe=False)
+        else:
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
+
+
+@api_view(['POST'])
+def external_api_add_firewall_rule(request, id):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
+
+    firewall_type = request.POST["type"]
+    firewall_port = request.POST["port"]
+    obj = {
+        "tipo": firewall_type,
+        "ipPort": firewall_port,
+    }
+
+    try:
+        req = requests.post(f'http://{device_ip}:5000/criarRegraFirewall', data=obj)
+        if req.status_code == 200:
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
+            # TODO: ADD TO DATABASE
+            return JsonResponse({"data": "Firewall Rule created", "status": req.status_code}, safe=False)
+        else:
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
+
+
+# RULES to DB
+def add_qos_rule_db(qos_data): # ADD QoS rule to database
+    try:
+        print('ADDED TO DB -> ' + str(qos_data))
+        qos_serializer = QoS_Rules_Serializer(data=qos_data)
+        if qos_serializer.is_valid():
+            qos_serializer.save()
+            return JsonResponse("Added Successfully", safe=False)
+        return JsonResponse("Failed to add", safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+def remove_qos_rule_db(id):  # DELETE QoS rule from database
+    qos_rules = QoS_Rules.objects.get(id=id)
+    qos_rules.delete()
+    return JsonResponse("Deleted Successfully", safe=False)
+
+
+def add_qos_filter_db(request): # add QoS to database
+    qos_data = JSONParser().parse(request)
+    qos_serializer = QoS_Filters_Serializer(data=qos_data)
+    if qos_serializer.is_valid():
+        qos_serializer.save()
+        return JsonResponse("Added Successfully", safe=False)
+    else:
+        return JsonResponse("Failed to add", safe=False)
+def add_firewall_rule_db(request): # add QoS to database
+    firewall_data = JSONParser().parse(request)
+    firewall_serializer = Firewall_Serializer(data=firewall_data)
+    if firewall_serializer.is_valid():
+        firewall_serializer.save()
+        return JsonResponse("Added Successfully", safe=False)
+    else:
+        return JsonResponse("Failed to add", safe=False)
+
+
+@api_view(['GET'])
+def getQoSRules(request, id):
+    try:
+        rules = QoS_Rules.objects.get(id=id)
+        qos_serializer = QoS_Rules_Serializer(rules, many=True)
+        print(qos_serializer.data)
+        return JsonResponse(qos_serializer.data, safe=False)
+    except Exception as e:
+        return JsonResponse({'Error': str(e)}, status=400)
 
 
 def createGraph(request, id):
