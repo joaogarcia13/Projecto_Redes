@@ -12,7 +12,8 @@ def createwifi():
 
     if name == "" or password == "":
         return "name ou password vazio."
-                
+    if len(password) < 8 and password != "null":
+        return "password tem de ter o minimo de 8 caractéres."
     if (password == "null"):
         subprocess.Popen(['nohup','sh', 'pi_REST/createwifi.sh', name])
     else:
@@ -170,7 +171,7 @@ def apagarRegraFirewall():
 #Monitoring
 @app.route("/monitoring", methods=['GET'])
 def monitoring() :
-    device = subprocess.check_output(['nohup', 'sh', 'networkManager/monitoring.sh', 'wlan0'])
+    device = subprocess.check_output(['sh', 'networkManager/monitoring.sh', 'wlan0'])
 
     return str(device)
 
