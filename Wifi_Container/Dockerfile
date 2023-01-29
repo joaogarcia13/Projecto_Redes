@@ -11,7 +11,6 @@ RUN apt-get -y install isc-dhcp-server
 RUN apt-get -y install iptables
 RUN apt-get -y install ufw
 RUN apt-get -y install iproute2
-RUN apt-get -y install arp-scan
 EXPOSE 5000
 COPY firewall ./firewall
 COPY networkManager ./networkManager
