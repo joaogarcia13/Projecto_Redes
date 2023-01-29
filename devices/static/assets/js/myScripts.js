@@ -249,7 +249,6 @@ function createChart(element, data, timestamp) {
       data: chartData,
       options: gradientChartOptionsConfigurationWithTooltipPurple
     });
-    myChart.update('none');
 }
 
 /* API functions */
