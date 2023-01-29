@@ -1,5 +1,7 @@
+import datetime
 import json
 import requests
+import subprocess
 
 from django.shortcuts import render
 from django import template
@@ -81,7 +83,14 @@ def index(request):
 def device_details(request, id):
     device = Device.objects.get(device_id=id)
     qos_rules = QoS_Rules.objects.all().filter(device=id)
+    firewall_rules = Firewall.objects.all().filter(device=id)
     # qos_filters = QoS_Filters.objects.all().filter(rule=qos_rules.id)
+
+    # IPs de cada RPI, cujo o node exporter esta a correr no porto 9100
+    # client = "http://192.168.229.113:9100"
+    client = device.ip
+    print(client);
+    # print(get_info(client))
 
     # for rule in qos_rules:
     #     print(rule.id)
@@ -89,7 +98,8 @@ def device_details(request, id):
     obj_render = {
         'device': device,
         'qos_rules': qos_rules,
-        # 'qos_filters': qos_filters
+        # 'qos_filters': qos_filters,
+        'firewall_rules': firewall_rules
     }
 
     return render(request, 'home/device_details.html', obj_render)
@@ -271,7 +281,22 @@ def external_api_create_wifi(request, id):
         if req.status_code == 200:
             data = req.text
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + data)
-            return JsonResponse({"data": "Created Successfully", "status": req.status_code}, safe=False)
+
+            wifi_db = {
+                'device_id': device.device_id,
+                'name': device.name,
+                'ip': device.ip,
+                'mac_address': device.mac_address,
+                'wifi_ssid': request.POST["wifi_ssid"],
+                'wifi_pwd': request.POST["wifi_pwd"],
+                'type': device.type,
+                'status': device.status
+            }
+            print("WIFI OBJECT ->" + str(wifi_db))
+
+            set_wifi_db(device, wifi_db) # add to db
+
+            return JsonResponse({"data": req.text, "status": req.status_code}, safe=False)
         else:
             print("Error: " + "Request failed")
             return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
@@ -286,23 +311,21 @@ def external_api_set_ip(request, id):
     device_ip = device.ip
 
     payload = {
-        'ip': request.POST.get("ip"),
-        'subnet': request.POST.get("subnet"),
-        'range1': request.POST.get("range1"),
-        'range2': request.POST.get("range2"),
-        'dns': request.POST.get("dns"),
+        'ip': request.POST["ip"],
+        'subnet': request.POST["subnet"],
+        'range1': request.POST["range1"],
+        'range2': request.POST["range2"],
+        'dns': request.POST["dns"],
     }
-    print(payload)
-
-    # jsonList = json.dumps(payload, separators=(',', ':'))
 
     try:
         req = requests.post(f'http://{device_ip}:5000/setip', data=payload)
+        print(req.status_code)
 
         if req.status_code == 200:
-            telemetries = req.text
-            print('Status: ' + str(req) + ' IP: ' + device_ip)
-            return JsonResponse({"data": "IP set", "status": req.status_code}, safe=False)
+            # TODO add to DB
+
+            return JsonResponse({"data": req.text, "status": req.status_code}, safe=False)
         else:
             print("Error: " + "Request failed")
             return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
@@ -311,18 +334,17 @@ def external_api_set_ip(request, id):
         return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
 
 
+
 @api_view(['GET'])
 def external_api_kill_network(request, id):
     device = Device.objects.get(device_id=id)
     device_ip = device.ip
 
     try:
-        req = requests.get(f'http://{device_ip}:5000/killnetwork', timeout=3)
+        req = requests.get(f'http://{device_ip}:5000/killnetwork')
 
         if req.status_code == 200:
-            resp = req.text
-            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + resp)
-            return JsonResponse(resp)
+            return JsonResponse({"data": req.text, "status": req.status_code}, safe=False)
         else:
             print("Error: " + "Request failed")
             return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
@@ -365,6 +387,11 @@ def external_api_add_qos_rule(request, id):
         "velocidadeNormal": qos_rule_normal_speed
     }
 
+    qos_rules = QoS_Rules.objects.all().filter(device=id)
+    for rule in qos_rules:
+        if rule.rule_name == qos_rule_name:
+            return JsonResponse({"data": "QoS Rule already exists", "status": 500}, safe=False)
+
     try:
         req = requests.post(f'http://{device_ip}:5000/criarRegraQoS', data=obj)
 
@@ -378,8 +405,8 @@ def external_api_add_qos_rule(request, id):
                 "normal_speed": qos_rule_normal_speed
             }
             # add QoS to database
-            added_qos = add_qos_rule_db(add_qos)
-            if added_qos.status_code == 200:
+            added_rule = add_qos_rule_db(add_qos)
+            if added_rule.status_code == 200:
                 return JsonResponse({"data": "QoS Rule created + Added to Database", "status": req.status_code}, safe=False)
 
             return JsonResponse({"data": "QoS Rule created", "status": req.status_code}, safe=False)
@@ -405,8 +432,8 @@ def external_api_remove_qos_rule(request, id):
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
 
             # add QoS to database
-            removed_qos = remove_qos_rule_db(qos_rule_id)
-            if removed_qos != 200:
+            removed_rule = remove_qos_rule_db(qos_rule_id)
+            if removed_rule != 200:
                 return JsonResponse({"data": "Failed to delete from database", "status": req.status_code}, safe=False)
 
             return JsonResponse({"data": "QoS Rule deleted", "status": req.status_code}, safe=False)
@@ -454,12 +481,54 @@ def external_api_add_firewall_rule(request, id):
         "ipPort": firewall_port,
     }
 
+    firewall_rules = Firewall.objects.all().filter(device=id)
+    for rule in firewall_rules:
+        if rule.port == firewall_port:
+            return JsonResponse({"data": "Port already exists", "status": 500}, safe=False)
+
     try:
         req = requests.post(f'http://{device_ip}:5000/criarRegraFirewall', data=obj)
+
         if req.status_code == 200:
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
-            # TODO: ADD TO DATABASE
+
+            add_firewall = {
+                "device": device.device_id,
+                "type": firewall_type,
+                "port": firewall_port
+            }
+            # add Firewall to database
+            added_rule = add_firewall_rule_db(add_firewall)
+        if added_rule.status_code == 200:
             return JsonResponse({"data": "Firewall Rule created", "status": req.status_code}, safe=False)
+        else:
+            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
+def external_api_remove_firewall_rule(request, id):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
+
+    firewall_rule_id = request.POST["rule_id"]
+    firewall_rule_type = request.POST["type"]
+    firewall_rule_port = request.POST["port"]
+    obj = {
+        "type": firewall_rule_type,
+        "port": firewall_rule_port
+    }
+
+    try:
+        req = requests.post(f'http://{device_ip}:5000/apagarRegraFirewall', data=obj)
+        if req.status_code == 200:
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
+
+            # add QoS to database
+            removed_rule = remove_firewall_rule_db(firewall_rule_id)
+            if removed_rule != 200:
+                return JsonResponse({"data": "Failed to delete from database", "status": req.status_code}, safe=False)
+
+            return JsonResponse({"data": "QoS Rule deleted", "status": req.status_code}, safe=False)
         else:
             return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
     except Exception as e:
@@ -467,7 +536,7 @@ def external_api_add_firewall_rule(request, id):
         return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
 
 
-# RULES to DB
+# DataBase
 def add_qos_rule_db(qos_data): # ADD QoS rule to database
     try:
         print('ADDED TO DB -> ' + str(qos_data))
@@ -492,6 +561,7 @@ def add_qos_filter_db(request): # add QoS to database
         return JsonResponse("Added Successfully", safe=False)
     else:
         return JsonResponse("Failed to add", safe=False)
+
 def add_firewall_rule_db(request): # add QoS to database
     firewall_data = JSONParser().parse(request)
     firewall_serializer = Firewall_Serializer(data=firewall_data)
@@ -500,6 +570,32 @@ def add_firewall_rule_db(request): # add QoS to database
         return JsonResponse("Added Successfully", safe=False)
     else:
         return JsonResponse("Failed to add", safe=False)
+def remove_firewall_rule_db(id):  # DELETE Firewall rule from database
+    firewall_rules = Firewall.objects.get(id=id)
+    firewall_rules.delete()
+    return JsonResponse("Deleted Successfully", safe=False)
+
+def set_wifi_db(device, wifi_data): # ADD QoS rule to database
+    try:
+        print('ADDED TO DB -> ' + str(wifi_data))
+        devices_serializer = DeviceSerializer(device, data=wifi_data)
+
+        if devices_serializer.is_valid():
+            devices_serializer.save()
+            return JsonResponse("Updated Successfully", safe=False)
+        return JsonResponse("Failed to update", safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+def set_ip_db(ip_data):  # DELETE QoS rule from database
+    try:
+        print('ADDED TO DB -> ' + str(ip_data))
+        qos_serializer = QoS_Rules_Serializer(data=ip_data)
+        if qos_serializer.is_valid():
+            qos_serializer.save()
+            return JsonResponse("Updated Successfully", safe=False)
+        return JsonResponse("Failed to add", safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 
 @api_view(['GET'])
@@ -513,14 +609,33 @@ def getQoSRules(request, id):
         return JsonResponse({'Error': str(e)}, status=400)
 
 
+@api_view(['GET'])
 def createGraph(request, id):
-    telemetries = Telemetry.objects.get(device_id=id)
-    print(telemetries)
-    device_ip = telemetries.device_id.ip
-    print(device_ip)
-    req = requests.get(f'http://{device_ip}:5000/')
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
 
-    if req.status_code == 200:
-        print('Status: ' + str(req) + ' IP: ' + device_ip)
+    try:
+        req = requests.get(f'http://192.168.1.91:9090/api/v1/query?query=node_network_receive_bytes_total')
 
-    return render(request, 'home/device_details.html', {'data': telemetries})
+        if req.status_code == 200:
+            # print(' IP: ' + device_ip + ' DATA: ' + req.text)
+
+            data = req.text
+            obj = json.loads(data)
+            timestamp = datetime.datetime.now()
+            timestamp = timestamp.strftime("%X")
+            result = obj['data']['result']
+
+            for res in result:
+                prometheus_ip = res['metric']['instance']
+                prometheus_device = res['metric']['device']
+                if prometheus_ip == (device_ip+":9100"):
+                    # if prometheus_device == 'wlan0':
+                    if prometheus_device == 'eth0':
+                        val = res['value'][1]
+                        return JsonResponse({"data": val, "timestamp": timestamp, "status": req.status_code}, safe=False)
+        else:
+            return JsonResponse({"data": "Failed: " + req.text, "status": req.status_code}, safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)

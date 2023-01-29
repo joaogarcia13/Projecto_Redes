@@ -165,7 +165,7 @@ function showNotification(from, align, icon, type, message) {
     });
 }
 
-function createChart(element, data) {
+function createChart(element, data, timestamp) {
     gradientChartOptionsConfigurationWithTooltipPurple = {
       maintainAspectRatio: false,
       legend: {
@@ -223,7 +223,7 @@ function createChart(element, data) {
     gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
 
     var chartData = {
-      labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+      labels: timestamp,
       datasets: [{
         label: "Data",
         fill: true,
@@ -249,6 +249,7 @@ function createChart(element, data) {
       data: chartData,
       options: gradientChartOptionsConfigurationWithTooltipPurple
     });
+    myChart.update('none');
 }
 
 /* API functions */
@@ -312,11 +313,15 @@ function switch_toggle_api(id, command) {
 }
 
 function create_wifi_api(id) {
+    var pwd = document.getElementById("wifi_password").value
     var obj = {
         'wifi_ssid': document.getElementById("wifi_name").value,
-        'wifi_pwd': document.getElementById("wifi_password").value
+        'wifi_pwd': pwd
     }
+    if (pwd == "" || pwd == null) obj.wifi_pwd = "null"
+
     var $crf_token = $('#create_wifi_device [name="csrfmiddlewaretoken"]').attr('value');
+    console.log('obj',obj)
     $.ajax({
         url: 'http://127.0.0.1:8000/devices/external/create_wifi/'+id,
         type: 'POST',
@@ -325,7 +330,36 @@ function create_wifi_api(id) {
         success: function(data){
             console.log(data);
             if (data.status == 200) {
-                showNotification('top','center','tim-icons icon-check-2','success','Created successful');
+                showNotification('top','center','tim-icons icon-check-2','success',data.data);
+            }
+            else {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+data.data);
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
+        }
+    });
+}
+function set_ip_wifi_api(id) {
+    var obj = {
+        'ip': document.getElementById("config_ip").value,
+        'subnet': document.getElementById("config_subnet").value,
+        'range1': document.getElementById("config_range1").value,
+        'range2': document.getElementById("config_range2").value,
+        'dns': document.getElementById("config_dns").value
+    }
+
+    var $crf_token = $('#set_ip_wifi [name="csrfmiddlewaretoken"]').attr('value');
+    $.ajax({
+        url: 'http://127.0.0.1:8000/devices/external/setip/'+id,
+        type: 'POST',
+        data: obj,
+        headers: {"X-CSRFToken": $crf_token},
+        success: function(data){
+            console.log(data);
+            if (data.status == 200) {
+                showNotification('top','center','tim-icons icon-check-2','success',data.data);
             }
             else {
                 showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+data.data);
@@ -338,12 +372,16 @@ function create_wifi_api(id) {
 }
 
 function kill_network_api(id) {
-    //var $crf_token = $('#create_wifi_device [name="csrfmiddlewaretoken"]').attr('value');
     $.ajax({
         url: 'http://127.0.0.1:8000/devices/external/killnetwork/'+id,
         type: 'GET',
         success: function(data){
-            console.log(data);
+            if (data.status == 200) {
+                showNotification('top','center','tim-icons icon-check-2','success',data.data);
+            }
+            else {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+data.data);
+            }
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
@@ -368,56 +406,6 @@ function add_rule_qos(id) {
             if (response.status == 200) {
                 showNotification('top','center','tim-icons icon-check-2','success',response.data);
                 location.reload();
-            }
-            else {
-                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
-            }
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
-        }
-    });
-}
-function add_filter_qos(id) {
-    var obj = {
-        'ip': document.getElementById("qos_ip").value,
-        'rule_name': document.getElementById("qos_rule").value
-    }
-    var $crf_token = $('#qos_filters [name="csrfmiddlewaretoken"]').attr('value');
-
-    $.ajax({
-        url: '/devices/external/qos/new_filter/'+id,
-        type: 'POST',
-        data: obj,
-        headers: {"X-CSRFToken": $crf_token},
-        success: function(response) {
-            if (response.status == 200) {
-                showNotification('top','center','tim-icons icon-check-2','success',response.data);
-            }
-            else {
-                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
-            }
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
-        }
-    });
-}
-function add_rule_firewall(id) {
-    var obj = {
-        'type': document.getElementById("firewall_type").value,
-        'port': document.getElementById("firewall_port").value
-    }
-    var $crf_token = $('#firewall [name="csrfmiddlewaretoken"]').attr('value');
-
-    $.ajax({
-        url: '/devices/external/firewall/new_rule/'+id,
-        type: 'POST',
-        data: obj,
-        headers: {"X-CSRFToken": $crf_token},
-        success: function(response) {
-            if (response.status == 200) {
-                showNotification('top','center','tim-icons icon-check-2','success',response.data);
             }
             else {
                 showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
@@ -458,12 +446,119 @@ function remove_rule_qos(device_id, rule_id, rule_name) {
     }
 }
 
-function getDataGraph(){
+function add_filter_qos(id) {
+    var obj = {
+        'ip': document.getElementById("qos_ip").value,
+        'rule_name': document.getElementById("qos_rule").value
+    }
+    var $crf_token = $('#qos_filters [name="csrfmiddlewaretoken"]').attr('value');
+
     $.ajax({
-        url: 'http://127.0.0.1:8000/api/graph',
+        url: '/devices/external/qos/new_filter/'+id,
+        type: 'POST',
+        data: obj,
+        headers: {"X-CSRFToken": $crf_token},
+        success: function(response) {
+            if (response.status == 200) {
+                showNotification('top','center','tim-icons icon-check-2','success',response.data);
+            }
+            else {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
+        }
+    });
+}
+
+function add_rule_firewall(id) {
+    var obj = {
+        'type': document.getElementById("firewall_type").value,
+        'port': document.getElementById("firewall_port").value
+    }
+    var $crf_token = $('#firewall [name="csrfmiddlewaretoken"]').attr('value');
+
+    $.ajax({
+        url: '/devices/external/firewall/new_rule/'+id,
+        type: 'POST',
+        data: obj,
+        headers: {"X-CSRFToken": $crf_token},
+        success: function(response) {
+            if (response.status == 200) {
+                showNotification('top','center','tim-icons icon-check-2','success',response.data);
+            }
+            else {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
+        }
+    });
+}
+function remove_rule_firewall(device_id, rule_type, rule_port) {
+    var text = "Delete rule?";
+    if (confirm(text) == true) {
+        var obj = {
+            'rule_id': rule_id,
+            'type': rule_type,
+            'port': rule_port
+        }
+        var $crf_token = $('#firewall [name="csrfmiddlewaretoken"]').attr('value');
+
+        $.ajax({
+            url: '/devices/external/qos/delete_rule/'+device_id,
+            type: 'POST',
+            data: obj,
+            headers: {"X-CSRFToken": $crf_token},
+            success: function(response) {
+                if (response.status == 200) {
+                    showNotification('top','center','tim-icons icon-check-2','success',response.data);
+                    location.reload();
+                }
+                else {
+                    showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
+            }
+        });
+    }
+}
+
+var graph_data = [];
+var timestamps = [];
+var lastVal = 0;
+function getDataGraph(id){
+//    var $crf_token = $('#set_ip_wifi [name="csrfmiddlewaretoken"]').attr('value');
+    $.ajax({
+        url: 'http://127.0.0.1:8000/api/graph/'+id,
         type: 'GET',
-        success: function(result) {
-            console.log(result);
+        success: function(data){
+            if (data.status == 200) {
+                var newVal = (data.data / 1000).toFixed(2);
+                var addVal;
+
+                if (lastVal > 0) {
+                    addVal = newVal - lastVal;
+                    graph_data.push(addVal);
+                    timestamps.push(data.timestamp);
+                }
+                else {
+                    graph_data.push(0);
+                    timestamps.push(data.timestamp);
+                }
+                createChart(document.getElementById('lineChartExample'), graph_data, timestamps);
+                lastVal = newVal;
+            }
+            else {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+data.data);
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
         }
     });
 }
@@ -492,7 +587,8 @@ function edit_api(id) {
         'wifi_ssid': document.getElementById("device_ssid").value,
         'wifi_pwd': document.getElementById("device_pwd").value,
         'type': document.getElementById("device_type").value,
-        'status': document.getElementById("device_status").checked
+        'status': document.getElementById("device_status").checked,
+        'coordinates': document.getElementById("device_coords").value
     };
     console.log(obj);
 
@@ -503,8 +599,8 @@ function edit_api(id) {
         data: obj,
         headers: {"X-CSRFToken": $crf_token},
         success: function(result) {
-            console.log(result);
             showNotification('top','center','tim-icons icon-check-2','success','Edited successful');
+            location.reload();
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             console.log("Status: " + textStatus + "\nError: " + errorThrown);

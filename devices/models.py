@@ -63,6 +63,7 @@ class QoS_Filters(models.Model):
 
 class Firewall(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True, unique=True)
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)  # chave estrangeira do dispositivo
     type = models.CharField(max_length=250)
     port = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)

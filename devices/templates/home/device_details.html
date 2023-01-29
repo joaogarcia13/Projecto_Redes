@@ -90,6 +90,25 @@
     {% include 'home/device/config.html' %}
     {% include 'home/device/edit.html' %}
 
+
+    <!-- Graphs / Charts -->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card card-chart">
+          <div class="card-header">
+            <h5 class="card-category">Performance [Bit rate]</h5>
+            <h3 class="card-title"><i class="tim-icons icon-wifi text-primary"></i> Wi-Fi</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-area">
+              <canvas id="lineChartExample"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Commands -->
     <div class="row">
 
@@ -170,47 +189,48 @@
           </div>
 
           <div class="card-body">
-            <form role="form" method="post" action="">
+            <form role="form" method="post" action="" id="set_ip_wifi">
+              {% csrf_token %}
               <div class="col-12">
                   <div class="form-group">
                       <label>IP</label>
-                      <input type="text" id="config_ip" name="config_ip" class="form-control" placeholder="192.168.254.1">
+                      <input type="text" id="config_ip" name="config_ip" class="form-control" placeholder="192.168.254.1" value="192.168.201.1">
                   </div>
               </div>
               <div class="col-12">
                   <div class="form-group">
                       <label>Subnet</label>
-                      <input type="text" id="config_subnet" name="config_subnet" class="form-control" placeholder="192.168.254.0">
+                      <input type="text" id="config_subnet" name="config_subnet" class="form-control" placeholder="192.168.254.0" value="192.168.201.0">
                   </div>
               </div>
               <div class="col-12">
                   <div class="form-group">
                       <label>Range 1</label>
-                      <input type="text" id="config_range1" name="config_range1" class="form-control" placeholder="192.168.254.20">
+                      <input type="text" id="config_range1" name="config_range1" class="form-control" placeholder="192.168.254.20" value="192.168.201.20">
                   </div>
               </div>
               <div class="col-12">
                   <div class="form-group">
                       <label>Range 2</label>
-                      <input type="text" id="config_range2" name="config_range2" class="form-control" placeholder="192.168.254.90">
+                      <input type="text" id="config_range2" name="config_range2" class="form-control" placeholder="192.168.254.90" value="192.168.201.90">
                   </div>
               </div>
               <div class="col-12">
                   <div class="form-group">
                       <label>DNS</label>
-                      <input type="text" id="config_dns" name="config_dns" class="form-control" placeholder="8.8.8.8">
+                      <input type="text" id="config_dns" name="config_dns" class="form-control" placeholder="8.8.8.8" value="8.8.8.8">
                   </div>
               </div>
-              <div class="col-12">
+              <!--<div class="col-12">
                   <div class="form-group">
                       <label>Route</label>
                       <input type="text" id="config_route" name="config_route" class="form-control" placeholder="192.168.1.68">
                   </div>
-              </div>
+              </div>-->
             </form>
 
             <div class="col-12 text-center">
-              <div class="btn btn-sm btn-primary">
+              <div class="btn btn-sm btn-primary" onclick="set_ip_wifi_api({{device.device_id}})">
                 <a style="width: 100px; height: 25px" type="button" class="btn btn-link btn-icon">
                   <span>SET IP</span>
                 </a>
@@ -223,121 +243,10 @@
 
     </div>
 
-    <!-- Graphs -->
+
+    <!-- Quality of Service -->
+    <!-- Rules Table -->
     <div class="row">
-      <!-- Performance (Big line graph) -->
-      <div class="col-12">
-        <div class="card card-chart">
-          <div class="card-header ">
-            <div class="row">
-              <div class="col-sm-6 text-left">
-                <!-- <h5 class="card-category">Total Shipments</h5> -->
-                <h2 class="card-title">Performance</h2>
-              </div>
-
-              <!-- Buttons (change dataset) -->
-              <div class="col-sm-6">
-                <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-                  <label class="btn btn-sm btn-primary btn-simple active" id="0">
-                    <input type="radio" name="options" checked>
-                    <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Accounts</span>
-                    <span class="d-block d-sm-none">
-                      <i class="tim-icons icon-single-02"></i>
-                    </span>
-                  </label>
-                  <label class="btn btn-sm btn-primary btn-simple" id="1">
-                    <input type="radio" class="d-none d-sm-none" name="options">
-                    <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Purchases</span>
-                    <span class="d-block d-sm-none">
-                      <i class="tim-icons icon-gift-2"></i>
-                    </span>
-                  </label>
-                  <label class="btn btn-sm btn-primary btn-simple" id="2">
-                    <input type="radio" class="d-none" name="options">
-                    <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Sessions</span>
-                    <span class="d-block d-sm-none">
-                      <i class="tim-icons icon-tap-02"></i>
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="chartBig1"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- end of row -->
-
-    <!-- Total Shipments (line graph) -->
-    <div class="row">
-      <div class="col-lg-4">
-        <div class="card card-chart">
-          <div class="card-header">
-            <h5 class="card-category">Total Shipments</h5>
-            <h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> 763,215</h3>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="chartLinePurple"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Daily Sales (bar graph) -->
-      <div class="col-lg-4">
-        <div class="card card-chart">
-          <div class="card-header">
-            <h5 class="card-category">Daily Sales</h5>
-            <h3 class="card-title"><i class="tim-icons icon-delivery-fast text-info"></i> 3,500€</h3>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="CountryChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Completed Tasks (line graph) -->
-      <div class="col-lg-4">
-        <div class="card card-chart">
-          <div class="card-header">
-            <h5 class="card-category">Completed Tasks</h5>
-            <h3 class="card-title"><i class="tim-icons icon-send text-success"></i> 12,100K</h3>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="chartLineGreen"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Charts -->
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="card card-chart">
-          <div class="card-header">
-            <h5 class="card-category">Bit rate</h5>
-            <h3 class="card-title"><i class="tim-icons icon-wifi text-primary"></i> Wi-Fi</h3>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="lineChartExample"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <div class="row">
-      <!-- Rules Table -->
       <div class="col-md-12">
         <div class="card">
           <div class="card-header">
@@ -366,7 +275,7 @@
                     <td>{{rule.normal_speed}}</td>
                     <td>{{rule.device.ip}}</td><!-- <td>{{qos_filters.ip}}</td>-->
                     <td>{{rule.created_at}}</td>
-                    <td onclick="remove_rule_qos({{device.device_id}},{{rule.id}},'{{rule.rule_name}}')" style="cursor: pointer;"><icon class="tim-icons icon-simple-remove"></icon></td>
+                    <td onclick="remove_rule_qos({{device.device_id}},{{rule.id}},'{{rule.rule_name}}')" style="cursor: pointer;"><icon class="tim-icons icon-trash-simple"></icon></td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -379,8 +288,6 @@
 
     <!-- Other commands (QoS + Firewall) -->
     <div class="row">
-
-      <!-- Quality of Service -->
       <div class="col-md-6">
         <div class="card">
           <div class="card-header ">
@@ -417,7 +324,9 @@
             </div>
           </div>
         </div>
+      </div>
 
+      <div class="col-md-6">
         <div class="card">
           <div class="card-header ">
             <h4 class="card-title">QoS Filters</h4>
@@ -448,8 +357,48 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Firewall -->
+
+    <!-- Firewall -->
+    <!-- Table -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3>Firewall</h3>
+            <h4 class="card-title">Rules for <b>{{device.ip}}</b></h4>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table tablesorter" id="firewall_rules_table">
+                <thead class=" text-primary">
+                  <tr>
+                    <th>Device</th>
+                    <th>Type</th>
+                    <th>Deny</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for rule in firewall_rules %}
+                  <tr>
+                    <td>{{rule.device.name}}</td>
+                    <td>{{rule.type}}</td>
+                    <td>{{rule.port}}</td>
+                    <td>{{rule.created_at}}</td>
+                    <td onclick="remove_rule_firewall({{device.device_id}},{{rule.type}},'{{rule.port}}')" style="cursor: pointer;"><icon class="tim-icons icon-trash-simple"></icon></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- end of row -->
+
+    <!-- Create Rule Firewall -->
+    <div class="row">
       <div class="col-md-6">
         <div class="card">
           <div class="card-header ">
@@ -461,12 +410,16 @@
               <div class="col-12">
                   <div class="form-group">
                       <label>Firewall Type</label>
-                      <input type="text" id="firewall_type" name="firewall_type" class="form-control" value="port">
+                      <!-- <input type="text" id="firewall_type" name="firewall_type" class="form-control" value="port">-->
+                      <select id="firewall_type" name="firewall_type" class="form-control">
+                        <option value="port" style="background-color: #27293d;">Port</option>
+                        <option value="ip" style="background-color: #27293d;">IP</option>
+                      </select>
                   </div>
               </div>
               <div class="col-12">
                   <div class="form-group">
-                      <label>Firewall Port</label>
+                      <label>Firewall Port/IP</label>
                       <input type="text" id="firewall_port" name="firewall_port" class="form-control" value="80">
                   </div>
               </div>
@@ -491,10 +444,14 @@
   $(document).ready(function() {
     //getDataGraph();
     // Javascript method's body can be found in assets/js/demos.js
-    demo.initDashboardPageCharts();
+    //demo.initDashboardPageCharts();
+    //var graph_data = [80, 100, 70, 80, 120, 80];
 
-    var data =[80, 100, 70, 80, 120, 80]
-    createChart(document.getElementById('lineChartExample'), data);
+    getDataGraph({{ device.device_id }}); // First load of the page, then timer
+
+    window.setInterval( function() {
+      getDataGraph({{ device.device_id }});
+    }, 10000); // 10 secs
   });
 
   function showConfig() {
