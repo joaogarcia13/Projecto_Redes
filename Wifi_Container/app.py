@@ -171,7 +171,7 @@ def apagarRegraFirewall():
 #Monitoring
 @app.route("/monitoring", methods=['GET'])
 def monitoring() :
-    device = subprocess.check_output(['sh', 'networkManager/monitoring.sh', 'wlan0'])
+    device = subprocess.check_output(['nohup', 'sh', 'networkManager/monitoring.sh', 'wlan0'])
 
     return str(device)
 
