@@ -445,7 +445,7 @@ function remove_rule_qos(device_id, rule_id, rule_name) {
     }
 }
 
-function add_filter_qos(id) {
+function add_filter_qos(device_id) {
     var obj = {
         'ip': document.getElementById("qos_ip").value,
         'rule_name': document.getElementById("qos_rule").value
@@ -453,7 +453,7 @@ function add_filter_qos(id) {
     var $crf_token = $('#qos_filters [name="csrfmiddlewaretoken"]').attr('value');
 
     $.ajax({
-        url: '/devices/external/qos/new_filter/'+id,
+        url: '/devices/external/qos/new_filter/'+device_id,
         type: 'POST',
         data: obj,
         headers: {"X-CSRFToken": $crf_token},
@@ -469,6 +469,38 @@ function add_filter_qos(id) {
             showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
         }
     });
+}
+function remove_filter_qos(device_id, filter_id, priority, filterHandle, filterType) {
+    console.log(device_id, rule_type, rule_port);
+    var text = "Delete rule?";
+    if (confirm(text) == true) {
+        var obj = {
+            "filter_id": filter_id,
+            "priority": priority,
+            "filter_handle": filterHandle,
+            "filter_type": filterType
+        }
+        var $crf_token = $('#firewall [name="csrfmiddlewaretoken"]').attr('value');
+
+        $.ajax({
+            url: '/devices/external/firewall/delete_rule/'+device_id,
+            type: 'POST',
+            data: obj,
+            headers: {"X-CSRFToken": $crf_token},
+            success: function(response) {
+                if (response.status == 200) {
+                    showNotification('top','center','tim-icons icon-check-2','success',response.data);
+                    location.reload();
+                }
+                else {
+                    showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
+            }
+        });
+    }
 }
 
 function add_rule_firewall(id) {
@@ -486,6 +518,7 @@ function add_rule_firewall(id) {
         success: function(response) {
             if (response.status == 200) {
                 showNotification('top','center','tim-icons icon-check-2','success',response.data);
+                location.reload();
             }
             else {
                 showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+response.data);
@@ -496,7 +529,8 @@ function add_rule_firewall(id) {
         }
     });
 }
-function remove_rule_firewall(device_id, rule_type, rule_port) {
+function remove_rule_firewall(device_id, rule_id, rule_type, rule_port) {
+    console.log(device_id, rule_type, rule_port);
     var text = "Delete rule?";
     if (confirm(text) == true) {
         var obj = {
@@ -507,7 +541,7 @@ function remove_rule_firewall(device_id, rule_type, rule_port) {
         var $crf_token = $('#firewall [name="csrfmiddlewaretoken"]').attr('value');
 
         $.ajax({
-            url: '/devices/external/qos/delete_rule/'+device_id,
+            url: '/devices/external/firewall/delete_rule/'+device_id,
             type: 'POST',
             data: obj,
             headers: {"X-CSRFToken": $crf_token},
@@ -553,11 +587,11 @@ function getDataGraph(id){
                 lastVal = newVal;
             }
             else {
-                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+data.data);
+//                showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+data.data);
             }
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
-            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
+//            showNotification('top','center','tim-icons icon-sound-wave','danger','Failed: '+errorThrown);
         }
     });
 }

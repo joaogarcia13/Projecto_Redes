@@ -29,10 +29,10 @@ class QoS_Rules_Serializer(serializers.ModelSerializer):
 class QoS_Filters_Serializer(serializers.ModelSerializer):
     class Meta:
         model = QoS_Filters
-        fields = ('id', 'rule', 'ip')
+        fields = ('id', 'device', 'ip', 'rule_name', 'interface', 'priority', 'filterHandle', 'filterType')
 
 
 class Firewall_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Firewall
-        fields = ('id', 'type', 'port')
+        fields = ('id', 'device', 'type', 'port')

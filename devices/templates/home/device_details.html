@@ -247,7 +247,7 @@
     <!-- Quality of Service -->
     <!-- Rules Table -->
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-md-6">
         <div class="card">
           <div class="card-header">
             <h3>Quality of Service</h3>
@@ -284,6 +284,48 @@
           </div>
         </div>
       </div>
+
+      <!-- Filter Table -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h3>Quality of Service</h3>
+            <h4 class="card-title">Filters for <b>{{device.ip}}</b></h4>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table tablesorter" id="qos_filters_table">
+                <thead class=" text-primary">
+                  <tr>
+                    <th>Device</th>
+                    <th>Rule Name</th>
+                    <th>Interface</th>
+                    <th>Priority</th>
+                    <th>Filter Handle</th>
+                    <th>Filter Type</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for filter in qos_filters %}
+                  <tr>
+                    <td>{{filter.device.name}}</td>
+                    <td id="filter_list_name">{{filter.rule_name}}</td>
+                    <td>{{filter.interface}}</td>
+                    <td>{{filter.priority}}</td>
+                    <td>{{filter.filterHandle}}</td>
+                    <td>{{filter.filterType}}</td>
+                    <td>{{filter.created_at}}</td>
+                    <td onclick="remove_rule_qos({{device.device_id}},{{filter.id}},'{{filter.rule.name}}')" style="cursor: pointer;"><icon class="tim-icons icon-trash-simple"></icon></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div> <!-- end of row -->
 
     <!-- Other commands (QoS + Firewall) -->
@@ -377,6 +419,7 @@
                     <th>Device</th>
                     <th>Type</th>
                     <th>Deny</th>
+                    <th>Created</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -386,7 +429,7 @@
                     <td>{{rule.type}}</td>
                     <td>{{rule.port}}</td>
                     <td>{{rule.created_at}}</td>
-                    <td onclick="remove_rule_firewall({{device.device_id}},{{rule.type}},'{{rule.port}}')" style="cursor: pointer;"><icon class="tim-icons icon-trash-simple"></icon></td>
+                    <td onclick="remove_rule_firewall({{device.device_id}},{{rule.id}},'{{rule.type}}','{{rule.port}}')" style="cursor: pointer;"><icon class="tim-icons icon-trash-simple"></icon></td>
                   </tr>
                   {% endfor %}
                 </tbody>

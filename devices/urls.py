@@ -29,6 +29,7 @@ urlpatterns = [
     path("devices/external/qos/new_rule/<int:id>", views.external_api_add_qos_rule),
     path("devices/external/qos/delete_rule/<int:id>", views.external_api_remove_qos_rule),
     path("devices/external/qos/new_filter/<int:id>", views.external_api_add_qos_filter),
+    path("devices/external/qos/delete_filter/<int:id>", views.external_api_remove_qos_filter),
     path("devices/external/firewall/new_rule/<int:id>", views.external_api_add_firewall_rule),
     path("devices/external/firewall/delete_rule/<int:id>", views.external_api_remove_firewall_rule),
 

@@ -55,8 +55,14 @@ class QoS_Rules(models.Model):
 
 class QoS_Filters(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True, unique=True)
-    rule = models.ForeignKey(QoS_Rules, on_delete=models.CASCADE)  # chave estrangeira da regra
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)  # chave estrangeira do dispositivo
+    # rule = models.ForeignKey(QoS_Rules, on_delete=models.CASCADE)  # chave estrangeira da regra
     ip = models.CharField(max_length=100)
+    rule_name = models.CharField(max_length=100)
+    interface = models.CharField(max_length=100)
+    priority = models.CharField(max_length=100)
+    filterHandle = models.CharField(max_length=100)
+    filterType = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

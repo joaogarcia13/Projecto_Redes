@@ -84,7 +84,7 @@ def device_details(request, id):
     device = Device.objects.get(device_id=id)
     qos_rules = QoS_Rules.objects.all().filter(device=id)
     firewall_rules = Firewall.objects.all().filter(device=id)
-    # qos_filters = QoS_Filters.objects.all().filter(rule=qos_rules.id)
+    qos_filters = QoS_Filters.objects.all().filter(device=id)
 
     # IPs de cada RPI, cujo o node exporter esta a correr no porto 9100
     # client = "http://192.168.229.113:9100"
@@ -98,7 +98,7 @@ def device_details(request, id):
     obj_render = {
         'device': device,
         'qos_rules': qos_rules,
-        # 'qos_filters': qos_filters,
+        'qos_filters': qos_filters,
         'firewall_rules': firewall_rules
     }
 
@@ -431,7 +431,6 @@ def external_api_remove_qos_rule(request, id):
         if req.status_code == 200:
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
 
-            # add QoS to database
             removed_rule = remove_qos_rule_db(qos_rule_id)
             if removed_rule != 200:
                 return JsonResponse({"data": "Failed to delete from database", "status": req.status_code}, safe=False)
@@ -449,21 +448,75 @@ def external_api_add_qos_filter(request, id):
     device = Device.objects.get(device_id=id)
     device_ip = device.ip
 
-    qos_filter_ip = request.POST["ip"]
-    qos_filter_rule_name = request.POST["rule_name"]
+    filter_ip = request.POST["ip"]
+    filter_rule_name = request.POST["rule_name"]
+
     obj = {
-        "ip": qos_filter_ip,
-        "nomeRegra": qos_filter_rule_name,
+        "ip": filter_ip,
+        "nomeRegra": filter_rule_name
     }
+    print('obj' + str(obj))
 
     try:
         req = requests.post(f'http://{device_ip}:5000/criarFiltroQoS', data=obj)
         if req.status_code == 200:
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
-            # TODO: ADD TO DATABASE
-            return JsonResponse({"data": "QoS Filter created", "status": req.status_code}, safe=False)
+
+            res = json.loads(req.text)
+
+            new_filter = {
+                'device': device.device_id,
+                'ip': filter_ip,
+                'rule_name': filter_rule_name,
+                'interface': res["interface"],
+                'priority': res["priority"],
+                'filterHandle': res["filterHandle"],
+                'filterType': res["filterType"]
+            }
+            print('new_filter ->' + str(new_filter))
+
+            # add Filter to database
+            added_filter = add_qos_filter_db(new_filter)
+            print('filter db ->' + str(added_filter))
+            if added_filter.status_code == 200:
+                return JsonResponse({"data": "Filter created + Added to Database", "status": req.status_code}, safe=False)
+
+            return JsonResponse({"data": "QoS Filter created: "+req.text, "status": req.status_code}, safe=False)
         else:
             return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
+    except Exception as e:
+        print(f'Unable to connect to {device_ip}')
+        return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
+def external_api_remove_qos_filter(request, id):
+    device = Device.objects.get(device_id=id)
+    device_ip = device.ip
+
+    filter_id = request.POST["filter_id"]
+    filter_ip = request.POST["ip"]
+    filter_name = request.POST["name"]
+    interface = request.POST["interface"]
+    priority = request.POST["priority"]
+    filter_handle = request.POST["filterHandle"]
+    filter_type = request.POST["filterType"]
+
+    obj = {
+        "priority": priority,
+        "filterHandle": filter_handle,
+        "filterType": filter_type
+    }
+
+    try:
+        req = requests.post(f'http://{device_ip}:5000/apagarFiltroQoS', data=obj)
+        if req.status_code == 200:
+            print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
+
+            removed_filter = remove_firewall_rule_db(filter_id)
+            if removed_filter != 200:
+                return JsonResponse({"data": "Failed to delete from database", "status": req.status_code}, safe=False)
+
+            return JsonResponse({"data": "Failed "+req.text, "status": req.status_code}, safe=False)
+        else:
+            return JsonResponse({"data": "Request failed: "+req.text, "status": req.status_code}, safe=False)
     except Exception as e:
         print(f'Unable to connect to {device_ip}')
         return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
@@ -497,8 +550,9 @@ def external_api_add_firewall_rule(request, id):
                 "type": firewall_type,
                 "port": firewall_port
             }
-            # add Firewall to database
-            added_rule = add_firewall_rule_db(add_firewall)
+
+            added_rule = add_firewall_rule_db(add_firewall) # add Firewall to database
+
         if added_rule.status_code == 200:
             return JsonResponse({"data": "Firewall Rule created", "status": req.status_code}, safe=False)
         else:
@@ -514,8 +568,8 @@ def external_api_remove_firewall_rule(request, id):
     firewall_rule_type = request.POST["type"]
     firewall_rule_port = request.POST["port"]
     obj = {
-        "type": firewall_rule_type,
-        "port": firewall_rule_port
+        "tipo": firewall_rule_type,
+        "ipPort": firewall_rule_port
     }
 
     try:
@@ -523,14 +577,13 @@ def external_api_remove_firewall_rule(request, id):
         if req.status_code == 200:
             print('Status: ' + str(req) + ' IP: ' + device_ip + ' DATA: ' + req.text)
 
-            # add QoS to database
             removed_rule = remove_firewall_rule_db(firewall_rule_id)
             if removed_rule != 200:
                 return JsonResponse({"data": "Failed to delete from database", "status": req.status_code}, safe=False)
 
-            return JsonResponse({"data": "QoS Rule deleted", "status": req.status_code}, safe=False)
+            return JsonResponse({"data": "Firewall deleted | "+req.text, "status": req.status_code}, safe=False)
         else:
-            return JsonResponse({"data": "Request failed", "status": req.status_code}, safe=False)
+            return JsonResponse({"data": "Request failed: "+req.text, "status": req.status_code}, safe=False)
     except Exception as e:
         print(f'Unable to connect to {device_ip}')
         return JsonResponse({"data": "Unable to connect to " + device_ip, "status": str(e)}, safe=False)
@@ -553,23 +606,31 @@ def remove_qos_rule_db(id):  # DELETE QoS rule from database
     return JsonResponse("Deleted Successfully", safe=False)
 
 
-def add_qos_filter_db(request): # add QoS to database
-    qos_data = JSONParser().parse(request)
-    qos_serializer = QoS_Filters_Serializer(data=qos_data)
-    if qos_serializer.is_valid():
-        qos_serializer.save()
-        return JsonResponse("Added Successfully", safe=False)
-    else:
+def add_qos_filter_db(filter_data): # ADD QoS rule to database
+    try:
+        filter_serializer = QoS_Filters_Serializer(data=filter_data)
+        if filter_serializer.is_valid():
+            print('ADDED TO DB -> ' + str(filter_data))
+            filter_serializer.save()
+            return JsonResponse("Added Successfully", safe=False)
         return JsonResponse("Failed to add", safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+def remove_qos_filter_db(id):  # DELETE Firewall rule from database
+    firewall_rules = Firewall.objects.get(id=id)
+    firewall_rules.delete()
+    return JsonResponse("Deleted Successfully", safe=False)
 
-def add_firewall_rule_db(request): # add QoS to database
-    firewall_data = JSONParser().parse(request)
-    firewall_serializer = Firewall_Serializer(data=firewall_data)
-    if firewall_serializer.is_valid():
-        firewall_serializer.save()
-        return JsonResponse("Added Successfully", safe=False)
-    else:
+
+def add_firewall_rule_db(firewall_data): # add Firewall to database
+    try:
+        firewall_serializer = Firewall_Serializer(data=firewall_data)
+        if firewall_serializer.is_valid():
+            firewall_serializer.save()
+            return JsonResponse("Added Successfully", safe=False)
         return JsonResponse("Failed to add", safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 def remove_firewall_rule_db(id):  # DELETE Firewall rule from database
     firewall_rules = Firewall.objects.get(id=id)
     firewall_rules.delete()
@@ -630,8 +691,8 @@ def createGraph(request, id):
                 prometheus_ip = res['metric']['instance']
                 prometheus_device = res['metric']['device']
                 if prometheus_ip == (device_ip+":9100"):
-                    # if prometheus_device == 'wlan0':
-                    if prometheus_device == 'eth0':
+                    if prometheus_device == 'wlan0':
+                    # if prometheus_device == 'eth0':
                         val = res['value'][1]
                         return JsonResponse({"data": val, "timestamp": timestamp, "status": req.status_code}, safe=False)
         else:
