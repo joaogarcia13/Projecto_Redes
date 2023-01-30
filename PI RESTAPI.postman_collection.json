@@ -1,0 +1,312 @@
+---
+info:
+  _postman_id: ab9c8438-4723-4224-86e9-de550980b4d5
+  name: PI RESTAPI
+  schema: https://schema.getpostman.com/json/collection/v2.1.0/collection.json
+  _exporter_id: '24291437'
+item:
+- name: QoS
+  item:
+  - name: criarRegra
+    request:
+      method: POST
+      header: []
+      body:
+        mode: formdata
+        formdata:
+        - key: name
+          value: '1:20'
+          type: text
+        - key: velocidadeLimitada
+          value: '2'
+          type: text
+        - key: velocidadeNormal
+          value: '5'
+          type: text
+      url:
+        raw: 192.168.1.39:5000/criarRegraQoS
+        host:
+        - '192'
+        - '168'
+        - '1'
+        - '39'
+        port: '5000'
+        path:
+        - criarRegraQoS
+    response: []
+  - name: criarFiltro
+    request:
+      method: POST
+      header: []
+      body:
+        mode: formdata
+        formdata:
+        - key: ip
+          value: 10.0.0.3
+          type: text
+        - key: nomeRegra
+          value: '1:20'
+          type: text
+      url:
+        raw: 192.168.1.39:5000/criarFiltroQoS
+        host:
+        - '192'
+        - '168'
+        - '1'
+        - '39'
+        port: '5000'
+        path:
+        - criarFiltroQoS
+    response: []
+  - name: apagarRegra
+    request:
+      method: POST
+      header: []
+      body:
+        mode: formdata
+        formdata:
+        - key: name
+          value: '1:20'
+          type: text
+      url:
+        raw: 192.168.1.39:5000/apagarRegraQoS
+        host:
+        - '192'
+        - '168'
+        - '1'
+        - '39'
+        port: '5000'
+        path:
+        - apagarRegraQoS
+    response: []
+  - name: apagarFiltro
+    request:
+      method: POST
+      header: []
+      body:
+        mode: formdata
+        formdata:
+        - key: priority
+          value: ''
+          type: text
+        - key: filterHandle
+          value: ''
+          type: text
+        - key: filterType
+          value: ''
+          type: text
+      url:
+        raw: 192.168.1.39:5000/apagarFiltroQoS
+        host:
+        - '192'
+        - '168'
+        - '1'
+        - '39'
+        port: '5000'
+        path:
+        - apagarFiltroQoS
+    response: []
+- name: Network Manager
+  item:
+  - name: devicesConnect
+    request:
+      method: GET
+      header: []
+      url:
+        raw: 192.168.1.39:5000/monitoring
+        host:
+        - '192'
+        - '168'
+        - '1'
+        - '39'
+        port: '5000'
+        path:
+        - monitoring
+    response: []
+- name: firewall
+  item:
+  - name: criarRegra
+    request:
+      method: POST
+      header: []
+      body:
+        mode: formdata
+        formdata:
+        - key: tipo
+          value: port
+          type: text
+        - key: ipPort
+          value: '80'
+          type: text
+      url:
+        raw: 192.168.1.39:5000/criarRegraFirewall
+        host:
+        - '192'
+        - '168'
+        - '1'
+        - '39'
+        port: '5000'
+        path:
+        - criarRegraFirewall
+    response: []
+  - name: apagarRegra
+    request:
+      method: POST
+      header: []
+      body:
+        mode: formdata
+        formdata:
+        - key: tipo
+          value: port
+          type: text
+        - key: ipPort
+          value: '80'
+          type: text
+      url:
+        raw: 192.168.1.39:5000/apagarRegraFirewall
+        host:
+        - '192'
+        - '168'
+        - '1'
+        - '39'
+        port: '5000'
+        path:
+        - apagarRegraFirewall
+    response: []
+- name: setIP
+  protocolProfileBehavior:
+    disabledSystemHeaders: {}
+    followOriginalHttpMethod: true
+    followRedirects: false
+  request:
+    method: POST
+    header: []
+    body:
+      mode: formdata
+      formdata:
+      - key: ip
+        value: 192.168.254.1
+        type: text
+      - key: subnet
+        value: 192.168.254.0
+        type: text
+      - key: range1
+        value: 192.168.254.20
+        type: text
+      - key: range2
+        value: 192.168.254.90
+        type: text
+      - key: dns
+        value: 8.8.8.8
+        type: text
+      - key: route
+        value: '192.168.254.1
+
+          '
+        type: text
+    url:
+      raw: 192.168.1.39:5000/setip
+      host:
+      - '192'
+      - '168'
+      - '1'
+      - '39'
+      port: '5000'
+      path:
+      - setip
+  response: []
+- name: CriarRedeWifi
+  request:
+    method: POST
+    header: []
+    body:
+      mode: formdata
+      formdata:
+      - key: name
+        value: Pipi
+        type: text
+      - key: password
+        value: 'null'
+        type: text
+      - key: interface
+        value: wlan0
+        type: text
+        disabled: true
+    url:
+      raw: 192.168.1.39:5000/createwifi
+      host:
+      - '192'
+      - '168'
+      - '1'
+      - '39'
+      port: '5000'
+      path:
+      - createwifi
+  response: []
+- name: MatarRedeWifi
+  request:
+    method: GET
+    header: []
+    url:
+      raw: 192.168.1.39:5000/killnetwork
+      host:
+      - '192'
+      - '168'
+      - '1'
+      - '39'
+      port: '5000'
+      path:
+      - killnetwork
+  response: []
+- name: toggleSwitch
+  request:
+    method: POST
+    header: []
+    body:
+      mode: formdata
+      formdata:
+      - key: action
+        value: 'on'
+        type: text
+    url:
+      raw: 169.254.128.148:5000/toggleSwitch
+      host:
+      - '169'
+      - '254'
+      - '128'
+      - '148'
+      port: '5000'
+      path:
+      - toggleSwitch
+  response: []
+- name: infoPi
+  request:
+    method: GET
+    header: []
+    url:
+      raw: 192.168.1.39:5000/getinfo
+      host:
+      - '192'
+      - '168'
+      - '1'
+      - '39'
+      port: '5000'
+      path:
+      - getinfo
+  response: []
+- name: updatePi
+  request:
+    method: GET
+    header: []
+    url:
+      raw: 192.168.1.39:5000/update
+      host:
+      - '192'
+      - '168'
+      - '1'
+      - '39'
+      port: '5000'
+      path:
+      - update
+  response: []
+

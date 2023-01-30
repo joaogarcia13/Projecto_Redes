@@ -1,0 +1,125 @@
+---
+info:
+  _postman_id: fef3c6fb-ca5d-4131-a3e2-8652fce831b8
+  name: Orchestrator
+  schema: https://schema.getpostman.com/json/collection/v2.1.0/collection.json
+  _exporter_id: '24291437'
+item:
+- name: 127.0.0.1:8000/api/devices
+  request:
+    method: GET
+    header: []
+    url:
+      raw: http://127.0.0.1:8000/api/devices
+      protocol: http
+      host:
+      - '127'
+      - '0'
+      - '0'
+      - '1'
+      port: '8000'
+      path:
+      - api
+      - devices
+  response: []
+- name: 127.0.0.1:8000/api/devices/new
+  request:
+    method: POST
+    header: []
+    body:
+      mode: raw
+      raw: "{\r\n    \"name\": \"rpi-teste\",\r\n    \"mac_address\": \"fe80::959c:230f:c744:ba07\",\r\n
+        \   \"ip\": \"169.254.128.148\",\r\n    \"wifi_ssid\": \"teste\",\r\n    \"wifi_pwd\":
+        \"teste\",\r\n    \"type\": \"raspberrypi\",\r\n    \"status\": true\r\n}"
+      options:
+        raw:
+          language: json
+    url:
+      raw: http://127.0.0.1:8000/api/devices/new
+      protocol: http
+      host:
+      - '127'
+      - '0'
+      - '0'
+      - '1'
+      port: '8000'
+      path:
+      - api
+      - devices
+      - new
+  response: []
+- name: 127.0.0.1:8000/api/devices/update
+  request:
+    method: PUT
+    header: []
+    body:
+      mode: raw
+      raw: "{\r\n    \"device_id\": 3,\r\n    \"name\": \"rpi3\",\r\n    \"mac_address\":
+        \"fe80::2062:83c2:6099:8d83\",\r\n    \"ip\": \"169.254.128.148\",\r\n    \"wifi_ssid\":
+        \"rpi34\",\r\n    \"wifi_pwd\": \"raspberry\",\r\n    \"type\": \"raspberrypi\",\r\n
+        \   \"status\": true\r\n}"
+      options:
+        raw:
+          language: json
+    url:
+      raw: http://127.0.0.1:8000/api/devices/3/update
+      protocol: http
+      host:
+      - '127'
+      - '0'
+      - '0'
+      - '1'
+      port: '8000'
+      path:
+      - api
+      - devices
+      - '3'
+      - update
+  response: []
+- name: 127.0.0.1:8000/api/devices/delete
+  request:
+    method: DELETE
+    header: []
+    url:
+      raw: http://127.0.0.1:8000/api/devices/8/delete
+      protocol: http
+      host:
+      - '127'
+      - '0'
+      - '0'
+      - '1'
+      port: '8000'
+      path:
+      - api
+      - devices
+      - '8'
+      - delete
+      query:
+      - key: pk
+        value: '6'
+        disabled: true
+  response: []
+- name: API-TOKEN-AUTH
+  request:
+    method: GET
+    header:
+    - key: username
+      value: admin
+      type: text
+    - key: password
+      value: admin
+      type: text
+    url:
+      raw: http://127.0.0.1:8000/api-token-auth/
+      protocol: http
+      host:
+      - '127'
+      - '0'
+      - '0'
+      - '1'
+      port: '8000'
+      path:
+      - api-token-auth
+      - ''
+  response: []
+

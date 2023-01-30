@@ -1,0 +1,35 @@
+---
+info:
+  _postman_id: 6adb76b0-ebae-48cc-94f0-1923e100b7f8
+  name: Prometheus
+  schema: https://schema.getpostman.com/json/collection/v2.1.0/collection.json
+  _exporter_id: '24291437'
+item:
+- name: node_cpu_seconds_total
+  request:
+    method: GET
+    header: []
+    url:
+      raw: http://169.254.128.148:9090/api/v1/query_range?query=node_cpu_seconds_total&start=2023-01-21T13:00:00Z&end=2023-01-21T13:30:00Z&step=15m
+      protocol: http
+      host:
+      - '169'
+      - '254'
+      - '128'
+      - '148'
+      port: '9090'
+      path:
+      - api
+      - v1
+      - query_range
+      query:
+      - key: query
+        value: node_cpu_seconds_total
+      - key: start
+        value: '2023-01-21T13:00:00Z'
+      - key: end
+        value: '2023-01-21T13:30:00Z'
+      - key: step
+        value: 15m
+  response: []
+
